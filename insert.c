@@ -1,8 +1,7 @@
 #include<stdio.h>
 #include<ctype.h>
-#include<stdlib.h>
 
-#define MAX 10 
+#define MAX 5
 
 int main(){
 
@@ -20,20 +19,21 @@ int main(){
 			if(array[i]<array[j]){
 				temp=array[i];
 				n=j;
-				for(k=i;k>=0;k--){
+				for(k=i;k>j;k--){
 					array[k]=array[k-1];
 				}
-				break;
 				array[n]=temp;
+				break;
 			}
-			else if(array[i]==array[j]){
+			else if(array[i]==array[j])
 				;
-			}
-			else if(array[i]>array[j]){
-				;
-			}								
+			else if(array[i]>array[j])
+				;							
 		}
 	}
+	
 	for(i=0;i<MAX;i++)
 		printf("%2d",array[i]);
+	printf("\n");	
 }
+
