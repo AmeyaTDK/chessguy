@@ -1,3 +1,6 @@
 #inlcude<stdio.h>
 
-int main(){}
+int main(){
+
+	printf();
+}
