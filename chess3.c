@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<stdbool.h>
+#include<ctype.h>
 
 struct square{
 	bool present;
@@ -112,14 +113,18 @@ void init(){
 };
 
 void print_board(struct square board[8][8]);
+void input();
+void make_move(struct piece *,struct square *);
 
 int main(){ 
     
     init();
-    print_board(cb);
+  //  print_board(cb);
+    printf("Enter your move as white -\n");
+    input();
     
 }                 
-
+/*
 void print_board(struct square board[8][8]){
 
     int i,j;  
@@ -133,4 +138,136 @@ void print_board(struct square board[8][8]){
           }
         printf("\n");
     }
+}
+*/
+void make_move(struct piece *p, struct square *dst)
+{
+      // if dst has piece, remove it
+      dst->p->sqr = NULL;
+      dst->present = 0;
+      // remove the piece from current square
+      p->sqr->p = NULL;
+      p->sqr->present = 0;
+      // connect piece to dst square
+      p->sqr = dst;
+      dst->present = 1;
+      dst->p = p;
+}
+
+void input(){
+    int i,j,k=0;
+    char x,y,c;
+    char src_array[2],dst_array[2];
+    struct piece *ptr1;
+    struct square *ptr2;     
+
+      while((c=getchar())!=EOF){
+          if(islower(c)){
+              if(k==1){
+                  dst_array[0]=c;
+                  continue;
+              }
+              src_array[0]=c;
+          }
+
+          else if(isdigit(c)){
+              if(k==1){
+                  dst_array[1]=c;
+                  dst_array[2]='\0';
+                  continue;
+              } 
+              src_array[1]=c;
+              src_array[2]='\0';
+              k=1;
+          }
+
+          else
+                  continue;
+      }
+
+      x=src_array[0];
+      y=src_array[1];
+
+      switch(x){
+        case 'a':
+          i=0;
+          break; 
+  
+        case 'b':
+          i=1;
+          break;
+        
+        case 'c':
+          i=2;
+          break;      
+           
+        case 'd':
+          i=3;
+          break;      
+             
+        case 'e':
+          i=4;
+          break;
+  
+        case 'f':
+          i=5;
+          break;      
+  
+        case 'g':
+          i=6;
+          break;      
+  
+        case 'h':
+          i=7;
+          break;      
+      }
+
+      j=y-1;
+
+      ptr1=cb[i][j].p; //pointer type test 
+      
+      x=dst_array[0];
+      y=dst_array[1];
+      
+       switch(x){
+        case 'a':
+          i=0;
+          break; 
+  
+        case 'b':
+          i=1;
+          break;
+        
+        case 'c':
+          i=2;
+          break;      
+           
+        case 'd':
+          i=3;
+          break;      
+             
+        case 'e':
+          i=4;
+          break;
+  
+        case 'f':
+          i=5;
+          break;      
+  
+        case 'g':
+          i=6;
+          break;      
+  
+        case 'h':
+          i=7;
+          break;      
+      }
+      
+      j=y-1;
+
+      ptr2=&cb[i][j];
+
+
+    
+  //   make_move(ptr1,ptr2);
 }
