@@ -7,47 +7,43 @@ struct square{
 	bool present;
 	struct piece *p;
 }cb[8][8];
-
-enum tpiece{
-	K,Q,R,B,N,P
-}type;
-
+	
 struct piece{
 	bool colour;
 	struct square *sqr;
-	enum tpiece type;
-} BR1={0,NULL,R}, 
-  BN1={0,NULL,N},
-  BB1={0,NULL,B},
-  BQ={0,NULL,Q},
-  BK={0,NULL,K},
-  BB2={0,NULL,B},
-  BN2={0,NULL,N},
-  BR2={0,NULL,R},
-  BP1={0,NULL,P},
-  BP2={0,NULL,P},
-  BP3={0,NULL,P},
-  BP4={0,NULL,P},
-  BP5={0,NULL,P}, 
-  BP6={0,NULL,P},
-  BP7={0,NULL,P},
-  BP8={0,NULL,P},
-  WP1={1,NULL,P},
-  WP2={1,NULL,P},
-  WP3={1,NULL,P},
-  WP4={1,NULL,P},
-  WP5={1,NULL,P},
-  WP6={1,NULL,P},
-  WP7={1,NULL,P},
-  WP8={1,NULL,P},
-  WR1={1,NULL,R},
-  WN1={1,NULL,N},
-  WB1={1,NULL,B},
-  WQ={1,NULL,Q},
-  WK={1,NULL,K},
-  WB2={1,NULL,B},
-  WN2={1,NULL,N},
-  WR2={1,NULL,R}; 
+	char arr[3];
+} BR1={0,NULL,"BR"},
+  BN1={0,NULL,"BN"},
+  BB1={0,NULL,"BB"},
+  BQ={0,NULL,"BQ"},
+  BK={0,NULL,"BK"},
+  BB2={0,NULL,"BB"},
+  BN2={0,NULL,"BN"},
+  BR2={0,NULL,"BR"},
+  BP1={0,NULL,"BP"},
+  BP2={0,NULL,"BP"},
+  BP3={0,NULL,"BP"},
+  BP4={0,NULL,"BP"},
+  BP5={0,NULL,"BP"},
+  BP6={0,NULL,"BP"},
+  BP7={0,NULL,"BP"},
+  BP8={0,NULL,"BP"},
+  WP1={1,NULL,"WP"},
+  WP2={1,NULL,"WP"},
+  WP3={1,NULL,"WP"},
+  WP4={1,NULL,"WP"},
+  WP5={1,NULL,"WP"},
+  WP6={1,NULL,"WP"},
+  WP7={1,NULL,"WP"},
+  WP8={1,NULL,"WP"},
+  WR1={1,NULL,"WR"},
+  WN1={1,NULL,"WN"},
+  WB1={1,NULL,"WB"},
+  WQ={1,NULL,"WQ"},
+  WK={1,NULL,"WK"},
+  WB2={1,NULL,"WB"},
+  WN2={1,NULL,"WN"},
+  WR2={1,NULL,"WR"}; 
 
 void init(){
 cb[0][0].present=1;
@@ -150,7 +146,6 @@ WR2.sqr =&cb[7][7];
 
 void print_board(struct square board[8][8]);
 void input();
-char convert(enum tpiece type);
 
 int program_stop=0;
 
@@ -189,16 +184,11 @@ int turn_flag=0;
 void print_board(struct square board[8][8]){
 
 int i,j;  
-char c;
 
 	for(i=0;i<8;i++){
 	 	for(j=0;j<8;j++){
-			if(board[i][j].present){
-				if(board[i][j].p->colour == 0)
-					printf("B%c ",convert(board[i][j].p->type));
-				else if(board[i][j].p->colour == 1)
-					printf("W%c ",convert(board[i][j].p->type));
-				}
+			if(board[i][j].present)
+		        	printf("%c%c ",board[i][j].p->arr[0],board[i][j].p->arr[1]);
 			else 
 		        	printf("*  ");
 	  	}
@@ -206,37 +196,18 @@ char c;
 	}
 }
 
-char convert(enum tpiece type) {
-    switch(type) {
-        case K:
-            return 'K';
-        case Q:
-            return 'Q';
-        case R:
-            return 'R';
-        case B:
-            return 'B';
-        case N:
-            return 'N';
-        case P:
-            return 'P';
-        default:
-            return '\0'; 
-    }
-}
-
 void make_move(struct piece *p, struct square *dst){
 
 	if(dst->p != NULL){     
-        dst->p->sqr = NULL;
-        dst->present = 0;
-    } 
-    p->sqr->p = NULL;
-    p->sqr->present = 0;
+        	dst->p->sqr = NULL;
+        	dst->present = 0;
+        } 
+        p->sqr->p = NULL;
+        p->sqr->present = 0;
 
-    p->sqr = dst;       
-    dst->present = 1;
-    dst->p = p;
+        p->sqr = dst;       
+        dst->present = 1;
+        dst->p = p;
 }
 
 void input(){
