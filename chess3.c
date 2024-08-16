@@ -202,7 +202,7 @@ char c;
 			else 
 		        	printf("*  ");
 	  	}
-		printf("\n");
+		printf("\n");         
 	}
 }
 
