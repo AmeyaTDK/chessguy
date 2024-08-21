@@ -966,7 +966,8 @@ int i,j,c1=0,c2=0,file,rank,qual1,qual2;
 			return &cb[rank-1][file+1];
 		else
 			;
-	}	
+	}
+	
 }
 
 struct square *pawn_finder(char *arr,int n,struct square cb[8][8]){
@@ -981,34 +982,100 @@ int i,j,c1=0,c2=0,file,rank,qual1,qual2;
 	if(turn_flag == 1){
 		if(cb[rank+1][file].p == NULL) //white pwn 1 behind
 				;		
-		else	
+		else{	
 			if(cb[rank+1][file].p->type == P) 
 				return &cb[rank+1][file];
+		}
 		
 		if(cb[rank+2][file].p == NULL) //white pwn 2 behind
 				;	
-		else			
+		else
 			if(cb[rank+2][file].p->type == P)
 				return &cb[rank+2][file];			
 	}
 	else if(turn_flag == 0){	
 		if(cb[rank-1][file].p == NULL) //black pwn 1 behind
 				;
-			else if(cb[rank-1][file].p != NULL)
-				if(cb[rank-1][file].p->type == P)
-					return &cb[rank-1][file];
-		
+		else {
+			if(cb[rank-1][file].p->type == P)
+				return &cb[rank-1][file];
+		}	
+			
 		if(cb[rank-2][file].p == NULL) //black pwn 2 behind
 				;
-			else if(cb[rank-2][file].p != NULL)
-				if(cb[rank-2][file].p->type == P)
-					return &cb[rank-2][file];
-	}	
+		else
+			if(cb[rank-2][file].p->type == P)
+				return &cb[rank-2][file];
+	}
+	
+}
+
+struct square *pawncapt_finder(char *arr , int n,struct square cb[8][8]){
+	
+int i,j,c1=0,c2=0,file,rank,qual1,qual2;		
+	
+	file = arr[2]-'a';
+	rank = (8-(arr[3]-'0'));		
+	qual1 = arr[0]-'a';	
+	
+	
+	if(turn_flag==0){
+		if(cb[rank-1][file-1].p == NULL) 
+				;
+		else{		
+			if(cb[rank-1][file-1].p->type == P)
+				if(qual1 == file-1)
+					return &cb[rank-1][file-1];
+				else
+					;
+			else
+				;		
+		}
+		if(cb[rank-1][file+1].p == NULL) 
+				;
+		else{		
+			if(cb[rank-1][file+1].p->type == P)
+				if(qual1 == file+1)
+					return &cb[rank-1][file+1];
+				else
+					;	
+			else
+				;
+		}
+	}
+	
+	else if(turn_flag==1){
+		if(cb[rank+1][file-1].p == NULL) 
+				;
+		else{	
+			if(cb[rank+1][file-1].p->type == P)
+				if(qual1 == file-1)
+					return &cb[rank+1][file-1];
+				else
+					;
+			else
+				;		
+		}
+		if(cb[rank+1][file+1].p == NULL) 
+				;
+		else{		
+			if(cb[rank+1][file+1].p->type == P)
+				if(qual1 == file+1)
+					return &cb[rank+1][file+1];
+				else
+					;
+			else
+				;			
+		}
+	}
+	
 }
 
 struct square *source_finder(char *arr,int n,struct square cb[8][8]){
 
-	if(n==2)
+	 if(arr[1] == 'x')
+		return(pawncapt_finder(arr,n,cb));
+	else if(n==2)
 		return(pawn_finder(arr,n,cb));
 	else if(arr[0]=='R')
 		return(rook_finder(arr,n,cb));
@@ -1019,7 +1086,11 @@ struct square *source_finder(char *arr,int n,struct square cb[8][8]){
 	else if (arr[0]=='Q')
 		return(queen_finder(arr,n,cb));
 	else if (arr[0]=='K')
-		return(king_finder(arr,n,cb));			
+		return(king_finder(arr,n,cb));	
+	//else if(arr[1] == 'x')
+	//	return(pawncapt_finder(arr,n,cb));
+		//printf("233\n");
+	//}			
 }
 
 void input (){
@@ -1070,10 +1141,3 @@ struct square *ptr2;
 	make_move(ptr1,ptr2);
 	
 }
-
-
-
-
-
-
-
