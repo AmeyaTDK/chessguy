@@ -1,0 +1,11 @@
+- implement generic find_piece and specific inputs.
+
+- Write down test cases for each piece.
+
+rook:
+rook horizontal [done/error] (d4,d5)
+root hotizontal with self blocking [done/error]  (d4,d5)
+root horizontal with oppo blocking [done/error] (d4,d5)
+
+
+
