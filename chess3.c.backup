@@ -166,33 +166,33 @@ int program_stop=0;
 int turn_flag=1;
 
 int main(){ 
-        
+    
 	init();
-	while(1){
+    	while(1){
 
-		if(program_stop == 1){
-			printf("Program stopped\n");
-			break;
-		}
-		else { 
-			if(turn_flag==1){
-				printf("Enter move as white -\n");
-				input();
+			if(program_stop == 1){
 				printf("\n");
-				print_board(cb);
-				printf("\n");
-				turn_flag = 0;
+				break;
 			}
-			else if(turn_flag==0){
-				printf("Enter move as black -\n");
-				input();
-				printf("\n");
-				print_board(cb);
-				printf("\n");
-				turn_flag = 1;
-		   	}
-		}
-	}
+			else { 
+				if(turn_flag==1){
+					printf("Enter move as white -\n");
+					input();
+					printf("\n");
+					print_board(cb);
+					printf("\n");
+					turn_flag = 0;
+				}
+				else if(turn_flag==0){
+					printf("Enter move as black -\n");
+					input();
+					printf("\n");
+					print_board(cb);
+					printf("\n");
+					turn_flag = 1;
+			   	}
+			}
+    	}
 } 
 
 void print_board(struct square board[8][8]){
@@ -202,7 +202,7 @@ char c;
 
 	for(i=0;i<9;i++){
 		if(i != 8)
-			printf("%d  ",(8-i));
+		printf("%d  ",(8-i));
 		
 		if(i==8){
 			for(j=0;j<9;j++){
@@ -215,7 +215,7 @@ char c;
 			}
 		}
 		else{
-			for(j=0;j<8;j++){
+		 	for(j=0;j<8;j++){
 				if(board[i][j].present){
 					if(board[i][j].p->colour == 0)
 						printf("B%c ",convert(board[i][j].p->type));
@@ -223,44 +223,44 @@ char c;
 						printf("W%c ",convert(board[i][j].p->type));
 					}
 				else 
-					printf("*  ");
-			}
+				    	printf("*  ");
+		  	}
 			printf("\n");
 		}         
 	}
 }
 
 char convert(enum tpiece type) {
-	switch(type) {
-		case K:
-			return 'K';
-		case Q:
-			return 'Q';
-		case R:
+    switch(type) {
+        case K:
+            return 'K';
+        case Q:
+            return 'Q';
+        case R:
             return 'R';
-		case B:
-			return 'B';
-		case N:
-			return 'N';
-		case P:
-			return 'P';
-		default:
-			return '\0'; 
-	}
+        case B:
+            return 'B';
+        case N:
+            return 'N';
+        case P:
+            return 'P';
+        default:
+            return '\0'; 
+    }
 }
 
 void make_move(struct piece *p, struct square *dst){
 
 	if(dst->p != NULL){     
-		dst->p->sqr = NULL;
-		dst->present = 0;
-	} 
-	p->sqr->p = NULL;
-	p->sqr->present = 0;
+        dst->p->sqr = NULL;
+        dst->present = 0;
+    } 
+    p->sqr->p = NULL;
+    p->sqr->present = 0;
 
-	p->sqr = dst;       
-	dst->present = 1;
-	dst->p = p;
+    p->sqr = dst;       
+    dst->present = 1;
+    dst->p = p;
 }
 
 struct square *bishop_finder(char *arr,int n,struct square cb[8][8]){
@@ -571,8 +571,8 @@ int i,j,c1=0,c2=0,file,rank,qual1,qual2;
 	for(j=0;c1<8;j++){ //right row
 		c1=file+j;
 		c2=rank;
-	printf("1234\n");	
-		if(cb[c2][c1].p == NULL) //Rb2 == 1 6 
+		
+		if(cb[c2][c1].p == NULL)
 			;
 		else{
 			if(cb[c2][c1].p->type == R && turn_flag == cb[c2][c1].p->colour){
@@ -595,7 +595,7 @@ int i,j,c1=0,c2=0,file,rank,qual1,qual2;
 	for(i=0;c2<8;i++){ //bottom coloumn
 		c1=file;
 		c2=rank+i;
-	printf("123\n");	
+		
 		if(cb[c2][c1].p == NULL)
 			;
 		else{
@@ -619,10 +619,9 @@ int i,j,c1=0,c2=0,file,rank,qual1,qual2;
 	for(j=0;c1>0;j++){ //left row
 		c1=file-j;
 		c2=rank;
-	printf("12\n");	
+		
 		if(cb[c2][c1].p == NULL)
 			;
-			
 		else{
 			if(cb[c2][c1].p->type == R && turn_flag == cb[c2][c1].p->colour){
 				if(n==4){
@@ -641,17 +640,12 @@ int i,j,c1=0,c2=0,file,rank,qual1,qual2;
 		}
 	}
 	
-	for(j=0;c2>0;j++){ //top coloumn
+	for(j=0;c2>0;i++){ //top coloumn
 		c1=file;
-		c2=rank-j;
-	printf("1\n");	
-		if(cb[c2][c1].p == NULL) //Ra4
+		c2=rank-i;
+		
+		if(cb[c2][c1].p == NULL)
 			;
-			
-		if(c2==0 && cb[c2][c1].p == NULL){
-			printf("Illegal move\n");
-			
-		}	
 		else{
 			if(cb[c2][c1].p->type == R && turn_flag == cb[c2][c1].p->colour){
 				if(n==4){
@@ -972,8 +966,7 @@ int i,j,c1=0,c2=0,file,rank,qual1,qual2;
 			return &cb[rank-1][file+1];
 		else
 			;
-	}
-	
+	}	
 }
 
 struct square *pawn_finder(char *arr,int n,struct square cb[8][8]){
@@ -983,61 +976,39 @@ int i,j,c1=0,c2=0,file,rank,qual1,qual2;
 	file = arr[0]-'a';
 	rank = (8-(arr[1]-'0'));
 	
+	//printf("%d %d\n",file ,rank);
+	
 	if(turn_flag == 1){
-			if(cb[rank+1][file].p != NULL && cb[rank+1][file].p->type == P) //white pwn 1 behind	 
+		if(cb[rank+1][file].p == NULL) //white pwn 1 behind
+				;		
+		else	
+			if(cb[rank+1][file].p->type == P) 
 				return &cb[rank+1][file];
-			
-			else if(cb[rank+2][file].p != NULL && cb[rank+2][file].p->type == P) //white pwn 2 behind	
-				return &cb[rank+2][file];	
-	
-			else
-				printf("Illegal move\n");								
+		
+		if(cb[rank+2][file].p == NULL) //white pwn 2 behind
+				;	
+		else			
+			if(cb[rank+2][file].p->type == P)
+				return &cb[rank+2][file];			
 	}
-	
-	else if(turn_flag == 0){
-			if(cb[rank-1][file].p != NULL && cb[rank-1][file].p->type == P) //black pwn 1 behind
+	else if(turn_flag == 0){	
+		if(cb[rank-1][file].p == NULL) //black pwn 1 behind
+				;
+			else if(cb[rank-1][file].p != NULL)
+				if(cb[rank-1][file].p->type == P)
 					return &cb[rank-1][file];
-			
-			else if(cb[rank-2][file].p == NULL && cb[rank-2][file].p->type == P) //black pwn 2 behind
+		
+		if(cb[rank-2][file].p == NULL) //black pwn 2 behind
+				;
+			else if(cb[rank-2][file].p != NULL)
+				if(cb[rank-2][file].p->type == P)
 					return &cb[rank-2][file];
-
-			else 
-				printf("Illegal move\n");			
-		}
-}
-
-struct square *pawncapt_finder(char *arr , int n,struct square cb[8][8]){
-	
-int i,j,c1=0,c2=0,file,rank,qual1,qual2;		
-	
-	file = arr[2]-'a';
-	rank = (8-(arr[3]-'0'));		
-	qual1 = arr[0]-'a';	
-	
-	
-	if(turn_flag==0){
-		if(cb[rank-1][file-1].p != NULL && cb[rank-1][file-1].p->type == P && qual1 == file-1) 
-					return &cb[rank-1][file-1];
-				
-		else if(cb[rank-1][file+1].p != NULL && cb[rank-1][file+1].p->type == P && qual1 == file+1) 
-					return &cb[rank-1][file+1];
-	}
-	
-	else if(turn_flag==1){ 
-		if(cb[rank+1][file-1].p != NULL && cb[rank+1][file-1].p->type == P && qual1 == file-1) 
-					return &cb[rank+1][file-1];
-				
-		else if(cb[rank+1][file+1].p != NULL && cb[rank+1][file+1].p->type == P && qual1 == file+1) 
-					return &cb[rank+1][file+1];
-	}
-	
+	}	
 }
 
 struct square *source_finder(char *arr,int n,struct square cb[8][8]){
 
-	 if(arr[1] == 'x')
-		return(pawncapt_finder(arr,n,cb));
-	else if(n==2)
+	if(n==2)
 		return(pawn_finder(arr,n,cb));
 	else if(arr[0]=='R')
 		return(rook_finder(arr,n,cb));
@@ -1048,7 +1019,7 @@ struct square *source_finder(char *arr,int n,struct square cb[8][8]){
 	else if (arr[0]=='Q')
 		return(queen_finder(arr,n,cb));
 	else if (arr[0]=='K')
-		return(king_finder(arr,n,cb));		
+		return(king_finder(arr,n,cb));			
 }
 
 void input (){
@@ -1099,4 +1070,9 @@ struct square *ptr2;
 	make_move(ptr1,ptr2);
 	
 }
+
+
+
+
+
 
