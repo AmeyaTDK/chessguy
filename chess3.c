@@ -299,7 +299,7 @@ char convert(enum tpiece type){
 
 void make_move(struct piece *p, struct square *dst){
 
-	if(dst->p != NULL){		    
+	if(dst->p != NULL){
 		dst->p->sqr = NULL;
 		dst->present = 0;
 	} 
@@ -381,6 +381,14 @@ struct piece *source_finder(enum tpiece type, int file, int rank, char qual, str
 
 	c1 = file; 
 	c2 = rank; 		
+    
+    
+    if(cb[rank][file].p != NULL && cb[rank][file].p->colour == turn_flag){
+        printf("Can't capture own pieces, try again\n");
+        return 0;
+    }    
+    else
+        ;
 
 	for(i=0;i<piece_arr_size;i++){ 
 	    file = c1;
@@ -404,6 +412,7 @@ struct piece *source_finder(enum tpiece type, int file, int rank, char qual, str
 			file_inc = piece_arr[i][0];
 			rank_inc = piece_arr[i][1];
 		}
+
 		for(; file<=max_file && rank<=max_rank && file>=min_file && rank >=min_rank; file += file_inc, rank+= rank_inc){
 				if(cb[rank][file].p != NULL){
 					if(cb[rank][file].p->type == type && turn_flag == cb[rank][file].p->colour){
@@ -419,14 +428,14 @@ struct piece *source_finder(enum tpiece type, int file, int rank, char qual, str
 							return (cb[rank][file]).p;
 					}
 					else if(cb[rank][file].p->type != type)
-							break;
-						;
+						    break;
 			    }
 				else
 					;
 	    }
 	}
-    printf("Illegal move, try again\n"); 
+    printf("Piece couldn't be found, try again\n");
+    return 0; 
 }	
 	
 void input (){
@@ -495,7 +504,7 @@ void input (){
 			type = P;
 		    break;
 	}
-
+    
 	ptr2 = &cb[rank][file];
 	
 	if(type == P && n==2)
@@ -507,16 +516,6 @@ void input (){
 
 	make_move(ptr1,ptr2);	
 }
-/*
-	*****TODO Chess3.c*****
-- Piece checking outside board #1
-- Piece movement through other pieces #1
-- Pawn normal and capture move optimized logic
-- Special moves
-- Move testing
-- Illegal move detection and retry $1
-- Same colour piece capture
-- Pawn shoudl only move twice on first move
 
-*/
+
 
