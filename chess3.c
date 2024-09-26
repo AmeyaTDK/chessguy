@@ -158,6 +158,54 @@ cb[7][7].p=&WR2;
 WR2.sqr =&cb[7][7];
 };
 
+int king_arr[8][2]={	
+	{1,0},
+	{1,1},
+	{0,1},
+	{-1,1},
+	{-1,0},
+	{-1,-1},
+	{0,-1},
+	{1,-1}
+};
+
+int queen_arr[8][2]={
+	{1,0},
+	{0,1},
+	{-1,0},
+	{0,-1},
+	
+	{1,1},
+	{-1,1},
+	{-1,-1},
+	{1,-1}	
+};
+
+int rook_arr[4][2]={
+	{1,0},
+	{0,1},
+	{-1,0},
+	{0,-1}	
+};
+
+int bishop_arr[4][2]={
+	{1,1},
+	{-1,1},
+	{-1,-1},
+	{1,-1}
+};
+
+int knight_arr[8][2]={
+	{1,2},
+	{1,-2},
+	{-1,2},
+	{-1,-2},
+	{2,1},
+	{2,-1},
+	{-2,1},
+	{-2,-1}
+};
+
 void print_board(struct square board[8][8]);
 void input();
 char convert(enum tpiece type);
@@ -230,14 +278,14 @@ char c;
 	}
 }
 
-char convert(enum tpiece type) {
+char convert(enum tpiece type){
 	switch(type) {
 		case K:
 			return 'K';
 		case Q:
 			return 'Q';
 		case R:
-            return 'R';
+	        return 'R';
 		case B:
 			return 'B';
 		case N:
@@ -251,7 +299,7 @@ char convert(enum tpiece type) {
 
 void make_move(struct piece *p, struct square *dst){
 
-	if(dst->p != NULL){     
+	if(dst->p != NULL){		    
 		dst->p->sqr = NULL;
 		dst->present = 0;
 	} 
@@ -263,804 +311,134 @@ void make_move(struct piece *p, struct square *dst){
 	dst->p = p;
 }
 
-struct square *bishop_finder(char *arr,int n,struct square cb[8][8]){
-	//checks bishop scope in clockwise starting from bottom right diagonal 
-int i,j,c1=0,c2=0,file,rank,qual1,qual2;
-	
-	if(n==3){				//Ba4
-	file = arr[1]-'a';
-	rank = (8-(arr[2]-'0'));
-	}
-	else if(n==4){	//Baa4 or B3a4
-		file = arr[2]-'a';
-		rank = (8-(arr[3]-'0'));
-		
-		if(islower(arr[1]))
-			qual1 = arr[1]-'a';
-		else if(isdigit(arr[1]))
-			qual2 =(8-(arr[1]-'0'));	
-	}
-	 
-	for(i=0,j=0;c1<8 && c2<8;i++,j++){ //+- diagonal
-		c1=file+j;
-		c2=rank+i;
-				
-		if(cb[c2][c1].p == NULL)
-			;
-		else{
-			if(cb[c2][c1].p->type == B && turn_flag == cb[c2][c1].p->colour){
-				if(n==4){	
-					if(islower(arr[1])){
-						if(qual1 == c1)
-							return &cb[c2][c1];
-					}
-					else if(isdigit(arr[1])){			
-						if(qual2 == c2)
-							return &cb[c2][c1]; 
-					}
-				}
-				else
-					return &cb[c2][c1];
-			}
-			else
-				;
-		}		
-	}
-	
-	for(i=0,j=0;c1>0 && c2<8;i++,j++){ // -- diagonal
-		c1=file-j;
-		c2=rank+i;
-				
-		if(cb[c2][c1].p == NULL)
-			;
-		else{
-			if(cb[c2][c1].p->type == B && turn_flag == cb[c2][c1].p->colour){
-				if(n==4){	
-					if(islower(arr[1])){
-						if(qual1 == c1)
-							return &cb[c2][c1];
-					}
-					else if(isdigit(arr[1])){			
-						if(qual2 == c2)
-							return &cb[c2][c1]; 
-					}
-				}
-				else
-					return &cb[c2][c1];
-			}
-			else
-				;
-		}
-	}
-
-	for(i=0,j=0;c1>0 && c2>0;i++,j++){ // +- diagonal
-		c1=file-j;
-		c2=rank-i;
-				
-		if(cb[c2][c1].p == NULL)
-			;
-		else{
-			if(cb[c2][c1].p->type == B && turn_flag == cb[c2][c1].p->colour){
-				if(n==4){	
-					if(islower(arr[1])){
-						if(qual1 == c1)
-							return &cb[c2][c1];
-					}
-					else if(isdigit(arr[1])){			
-						if(qual2 == c2)
-							return &cb[c2][c1]; 
-					}
-				}
-				else
-					return &cb[c2][c1];
-			}
-			else
-				;
-		}
-	}
-	
-	for(i=0,j=0;c1>0 && c2<8;i++,j++){ // ++ diagonal
-		c1=file+j;
-		c2=rank-i;
-	
-	if(cb[c2][c1].p == NULL)
-			;
-		else{
-			if(cb[c2][c1].p->type == B && turn_flag == cb[c2][c1].p->colour){
-				if(n==4){	
-					if(islower(arr[1])){
-						if(qual1 == c1)
-							return &cb[c2][c1];
-					}
-					else if(isdigit(arr[1])){			
-						if(qual2 == c2)
-							return &cb[c2][c1]; 
-					}
-				}
-				else
-					return &cb[c2][c1];
-			}
-			else
-				;
-		}				
-	}
-	
-}				
-		
-struct square *knight_finder(char *arr,int n,struct square cb[8][8]){
-	//outside board problem not solved
-	//checks clockwise starting form bottom right up
-int i,j,c1=0,c2=0,file,rank,qual1,qual2;		
-	
-	if(n==3){				//Na4
-		file = arr[1]-'a';
-		rank = (8-(arr[2]-'0'));
-	}
-	else if(n==4){	//Naa4 or N3a4
-		file = arr[2]-'a';
-		rank = (8-(arr[3]-'0'));
-		
-		if(islower(arr[1]))
-			qual1 = arr[1]-'a';
-		else if(isdigit(arr[1]))
-			qual2 =(8-(arr[1]-'0'));	
-	}
-	
-	if(cb[rank+1][file+2].p == NULL) 
-		;
-	else{ // bottom right up
-		if(cb[rank+1][file+2].p->type == N  && turn_flag == cb[rank+1][file+2].p->colour){	
-			if(n==4){
-				if(islower(arr[1]))
-					if(qual1 == arr[1])
-						return &cb[rank+1][file+2];
-				else if(isdigit(arr[1]))		
-					if(qual2 == arr[1])
-						return &cb[rank+1][file+2];
-			}
-			else 
-				return &cb[rank+1][file+2];
-		}
-		else 
-			;			
-	}
-		
-	if(cb[rank+2][file+1].p == NULL)
-		;	
-	else{ //bottom right down
-		if(cb[rank+2][file+1].p->type == N && turn_flag == cb[rank+2][file+1].p->colour){
-			if(n==4){
-				if(islower(arr[1]))
-					if(qual1 == arr[1])
-						return &cb[rank+2][file+1];
-				else if(isdigit(arr[1]))		
-					if(qual2 == arr[1])
-						return &cb[rank+2][file+1];						
-			}
-			else 
-				return &cb[rank+2][file+1];
-		}
-		else 
-			;		
-	}	
-			
-	if(cb[rank+2][file-1].p == NULL)
-		;	
-	else{ //bottom left down
-		if(cb[rank+2][file-1].p->type == N && turn_flag == cb[rank+2][file-1].p->colour){
-			if(n==4){
-				if(islower(arr[1]))
-					if(qual1 == arr[1])
-						return &cb[rank+2][file-1];
-				else if(isdigit(arr[1]))		
-					if(qual2 == arr[1])
-						return &cb[rank+2][file-1];							
-			}
-			else 
-				return &cb[rank+2][file-1];
-		}		
-	}
-			
-	if(cb[rank+1][file-2].p == NULL)
-		;	
-	else{ //bottom left up
-		if(cb[rank+1][file-2].p->type == N && turn_flag == cb[rank+1][file-2].p->colour){
-			if(n==4){
-				if(islower(arr[1]))
-					if(qual1 == arr[1])
-						return &cb[rank+1][file-2];
-				else if(isdigit(arr[1]))		
-					if(qual2 == arr[1])
-						return &cb[rank+1][file-2];					
-			}
-		else 
-			return &cb[rank+1][file-2];
-		}	
-	}
-			
-	if(cb[rank-1][file-2].p == NULL)
-		;	
-	else{ //top left down
-		if(cb[rank-1][file-2].p->type == N && turn_flag == cb[rank-1][file-2].p->colour){
-			if(n==4){
-				if(islower(arr[1]))
-					if(qual1 == arr[1])
-						return &cb[rank-1][file-2];
-				else if(isdigit(arr[1]))		
-					if(qual2 == arr[1])
-						return &cb[rank-1][file-2];							
-			}
-			else 
-				return &cb[rank-1][file-2];
-		}
-	}
-	
-	if(cb[rank-2][file-1].p == NULL)
-		;
-	else{ //top left up
-		if(cb[rank-2][file-1].p->type == N && turn_flag == cb[rank-2][file-1].p->colour){
-			if(n==4){
-				if(islower(arr[1]))
-					if(qual1 == arr[1])
-						return &cb[rank-2][file-1];
-				else if(isdigit(arr[1]))		
-					if(qual2 == arr[1])
-						return &cb[rank-2][file-1];				
-		}
-		else 
-			return &cb[rank-2][file-1];
-		}	
-	}
-		
-	if(cb[rank-2][file+1].p == NULL)
-		;	
-	else{ //top right up
-		if(cb[rank-2][file+1].p->type == N && turn_flag == cb[rank-2][file+1].p->colour){
-			if(n==4){
-				if(islower(arr[1]))
-					if(qual1 == arr[1])
-						return &cb[rank-2][file+1];
-				else if(isdigit(arr[1]))		
-					if(qual2 == arr[1])
-						return &cb[rank-2][file+1];
-							
-			}
-			else 
-				return &cb[rank-2][file+1];
-		}
-	}
-		
-	if(cb[rank-1][file+2].p == NULL)
-		;	
-	else{ //top right down
-		if(cb[rank-1][file+2].p->type == N && turn_flag == cb[rank-1][file+2].p->colour){
-			if(n==4){
-				if(islower(arr[1]))
-					if(qual1 == arr[1])
-						return &cb[rank-1][file+2];
-				else if(isdigit(arr[1]))		
-					if(qual2 == arr[1])
-						return &cb[rank-1][file+2];
-							
-			}
-			else 
-				return &cb[rank-1][file+2];
-		}
-	}
-	
-}
-
-struct square *rook_finder(char *arr,int n,struct square cb[8][8]){
-	//checks rook scope in clockwise starting from right row
-int i,j,c1=0,c2=0,file,rank,qual1,qual2;	
-	
-	if(n==3){				//Ra4
-		file = arr[1]-'a';
-		rank = (8-(arr[2]-'0'));
-	}
-	else if(n==4){	//Raa4 or R3a4
-		file = arr[2]-'a';
-		rank = (8-(arr[3]-'0'));
-		
-		if(islower(arr[1]))
-			qual1 = arr[1]-'a';
-		else if(isdigit(arr[1]))
-			qual2 =(8-(arr[1]-'0'));	
-	}
-	
-	for(j=0;c1<8;j++){ //right row
-		c1=file+j;
-		c2=rank;
-	printf("1234\n");	
-		if(cb[c2][c1].p == NULL) //Rb2 == 1 6 
-			;
-		else{
-			if(cb[c2][c1].p->type == R && turn_flag == cb[c2][c1].p->colour){
-				if(n==4){
-					if(islower(arr[1]))
-						if(qual1 == c1)
-							return &cb[c2][c1];
-					else if(isdigit(arr[1]))			
-						if(qual2 == c2)
-							return &cb[c2][c1];				
-				}
-				else
-					return &cb[c2][c1];
-			}
-			else
-				;
-		}
-	}
-	
-	for(i=0;c2<8;i++){ //bottom coloumn
-		c1=file;
-		c2=rank+i;
-	printf("123\n");	
-		if(cb[c2][c1].p == NULL)
-			;
-		else{
-			if(cb[c2][c1].p->type == R && turn_flag == cb[c2][c1].p->colour){
-				if(n==4){
-					if(islower(arr[1])){
-						if(qual1 == c1)
-							return &cb[c2][c1];
-						else if(qual2 == c2)
-							return &cb[c2][c1];
-					}				
-				}
-				else
-					return &cb[c2][c1];
-			}
-			else
-				;	
-		}
-	}
-	
-	for(j=0;c1>0;j++){ //left row
-		c1=file-j;
-		c2=rank;
-	printf("12\n");	
-		if(cb[c2][c1].p == NULL)
-			;
-			
-		else{
-			if(cb[c2][c1].p->type == R && turn_flag == cb[c2][c1].p->colour){
-				if(n==4){
-					if(islower(arr[1])){
-						if(qual1 == c1)
-							return &cb[c2][c1];
-						else if(qual2 == c2)
-							return &cb[c2][c1];
-					}				
-				}
-				else
-					return &cb[c2][c1];
-			}
-			else
-				;
-		}
-	}
-	
-	for(j=0;c2>0;j++){ //top coloumn
-		c1=file;
-		c2=rank-j;
-	printf("1\n");	
-		if(cb[c2][c1].p == NULL) //Ra4
-			;
-			
-		if(c2==0 && cb[c2][c1].p == NULL){
-			printf("Illegal move\n");
-			
-		}	
-		else{
-			if(cb[c2][c1].p->type == R && turn_flag == cb[c2][c1].p->colour){
-				if(n==4){
-					if(islower(arr[1])){
-						if(qual1 == c1)
-							return &cb[c2][c1];
-						else if(qual2 == c2)
-							return &cb[c2][c1];
-					}				
-				}
-				else
-					return &cb[c2][c1];
-			}
-			else
-				;
-		}
-	}
-	
-}
-
-struct square *queen_finder(char *arr,int n,struct square cb[8][8]){ 
-	//checks bishop scope in clockwise starting from bottom right diagonal
-	//checks rook scope in clockwise starting from right row
-int i,j,c1=0,c2=0,file,rank,qual1,qual2;	
-
-	if(n==3){				//Qa4
-	file = arr[1]-'a';
-	rank = (8-(arr[2]-'0'));
-	}
-	else if(n==4){	//Qaa4 or Q3a4
-		file = arr[2]-'a';
-		rank = (8-(arr[3]-'0'));
-		
-		if(islower(arr[1]))
-			qual1 = arr[1]-'a';
-		else if(isdigit(arr[1]))
-			qual2 =(8-(arr[1]-'0'));	
-	}
-	 
-	for(i=0,j=0;c1<8 && c2<8;i++,j++){ //+- diagonal
-		c1=file+j;
-		c2=rank+i;
-		
-		if(cb[c2][c1].p == NULL)
-			;	
-		else{
-			if(cb[c2][c1].p->type == Q && turn_flag == cb[c2][c1].p->colour){
-				if(n==4){	
-					if(islower(arr[1])){
-						if(qual1 == c1)
-							return &cb[c2][c1];
-					}
-					else if(isdigit(arr[1])){			
-						if(qual2 == c2)
-							return &cb[c2][c1]; 
-					}
-				}
-				else 
-					return &cb[c2][c1];
-			}
-			else
-				;
-		}		
-	}
-	
-	for(i=0,j=0;c1>0 && c2<8;i++,j++){ // -- diagonal
-		c1=file-j;
-		c2=rank+i;
-		
-		if(cb[c2][c1].p == NULL)
-			;
-		else{
-			if(cb[c2][c1].p->type == Q && turn_flag == cb[c2][c1].p->colour){
-				if(n==4){	
-					if(islower(arr[1])){
-						if(qual1 == c1)
-							return &cb[c2][c1];
-					}
-					else if(isdigit(arr[1])){			
-						if(qual2 == c2)
-							return &cb[c2][c1]; 
-					}
-				}
-				else 
-					return &cb[c2][c1];
-			}
-			else
-				;
-		}		
-	}
-	
-	for(i=0,j=0;c1>0 && c2>0;i++,j++){ // -+ diagonal
-		c1=file-j;
-		c2=rank-i;
-		
-		if(cb[c2][c1].p == NULL)
-			;
-		else{
-			if(cb[c2][c1].p->type == Q && turn_flag == cb[c2][c1].p->colour){
-				if(n==4){	
-					if(islower(arr[1])){
-						if(qual1 == c1)
-							return &cb[c2][c1];
-					}
-					else if(isdigit(arr[1])){			
-						if(qual2 == c2)
-							return &cb[c2][c1]; 
-					}
-				}
-				else 
-					return &cb[c2][c1];
-			}
-			else
-				;
-		}		
-	}
-	
-	for(i=0,j=0;c1>0 && c2<8;i++,j++){ // ++ diagonal
-		c1=file+j;
-		c2=rank-i;
-		
-		if(cb[c2][c1].p == NULL)
-			;
-		else{
-			if(cb[c2][c1].p->type == Q && turn_flag == cb[c2][c1].p->colour){
-				if(n==4){	
-					if(islower(arr[1])){
-						if(qual1 == c1)
-							return &cb[c2][c1];
-					}
-					else if(isdigit(arr[1])){			
-						if(qual2 == c2)
-							return &cb[c2][c1]; 
-					}
-				}
-				else 
-					return &cb[c2][c1];
-			}
-			else
-				;
-		}		
-	}
-	
-	for(j=0;c1<8;j++){ // right row
-		c1=file+j;
-		c2=rank;
-		
-		if(cb[c2][c1].p == NULL)
-			;
-		else{
-			if(cb[c2][c1].p->type == Q && turn_flag == cb[c2][c1].p->colour){
-				if(n==4){	
-					if(islower(arr[1])){
-						if(qual1 == c1)
-							return &cb[c2][c1];
-					}
-					else if(isdigit(arr[1])){			
-						if(qual2 == c2)
-							return &cb[c2][c1]; 
-					}
-				}
-				else 
-					return &cb[c2][c1];
-			}
-			else
-				;
-		}
-	}
-	
-	for(i=0;c2<8;i++){ //bottom coloumn
-		c1=file;
-		c2=rank+i;
-		
-		if(cb[c2][c1].p == NULL)
-			;
-		else{
-			if(cb[c2][c1].p->type == Q && turn_flag == cb[c2][c1].p->colour){
-				if(n==4){	
-					if(islower(arr[1])){
-						if(qual1 == c1)
-							return &cb[c2][c1];
-					}
-					else if(isdigit(arr[1])){			
-						if(qual2 == c2)
-							return &cb[c2][c1]; 
-					}
-				}
-				else 
-					return &cb[c2][c1];
-			}
-			else
-				;
-		}
-	}
-	
-	for(j=0;c1>0;j++){ // left row
-		c1=file-j;
-		c2=rank;
-		
-		if(cb[c2][c1].p == NULL)
-			;
-		else{
-			if(cb[c2][c1].p->type == Q && turn_flag == cb[c2][c1].p->colour){
-				if(n==4){	
-					if(islower(arr[1])){
-						if(qual1 == c1)
-							return &cb[c2][c1];
-					}
-					else if(isdigit(arr[1])){			
-						if(qual2 == c2)
-							return &cb[c2][c1]; 
-					}
-				}
-				else 
-					return &cb[c2][c1];
-			}
-			else
-				;
-		}
-	}
-	
-	for(j=0;c2>0;i++){ // top coloumn
-		c1=file;
-		c2=rank-i;
-		
-		if(cb[c2][c1].p == NULL)
-			;
-		else{
-			if(cb[c2][c1].p->type == Q && turn_flag == cb[c2][c1].p->colour){
-				if(n==4){	
-					if(islower(arr[1])){
-						if(qual1 == c1)
-							return &cb[c2][c1];
-					}
-					else if(isdigit(arr[1])){			
-						if(qual2 == c2)
-							return &cb[c2][c1]; 
-					}
-				}
-				else 
-					return &cb[c2][c1];
-			}
-			else
-				;
-		}
-	}
-
-}
-
-struct square *king_finder(char *arr,int n,struct square cb[8][8]){
-	//outside board problem not solved
-	//checks all 8 positions in clockwise rotation starting from right
-int i,j,c1=0,c2=0,file,rank,qual1,qual2;	
-
-	file = arr[1]-'a'; //Ka1 
-	rank = (8-(arr[2]-'0'));
-	
-	if(cb[rank][file+1].p == NULL) //right 
-		;
-	else{  
-		if(cb[rank][file+1].p->type == K && turn_flag == cb[rank][file+1].p->colour)
-			return &cb[rank][file+1];
-		else
-			;	
-	}
-	if(cb[rank+1][file+1].p == NULL)  //bottom right
-		;	
-	else{ 
-		if(cb[rank+1][file+1].p->type == K && turn_flag == cb[rank+1][file+1].p->colour)
-			return &cb[rank+1][file+1];
-		else
-			;
-	}
-	if(cb[rank+1][file].p == NULL) //bottom
-		;	
-	else{
-		if(cb[rank+1][file].p->type == K && turn_flag == cb[rank+1][file].p->colour)
-			return &cb[rank][file];
-		else
-			;	
-	}
-	if(cb[rank+1][file-1].p == NULL) //bottom left
-		;	
-	else{ 
-		if(cb[rank+1][file-1].p->type == K && turn_flag == cb[rank+1][file-1].p->colour)
-			return &cb[rank+1][file-1];
-		else
-			;
-	}
-	if(cb[rank][file-1].p == NULL) //left
-		;
-	else{  
-		if(cb[rank][file-1].p->type == K && turn_flag == cb[rank][file-1].p->colour)
-			return &cb[rank][file-1];
-		else
-			;
-	}
-	if(cb[rank-1][file-1].p == NULL) //top left
-		;	
-	else{
-		if(cb[rank-1][file-1].p->type == K && turn_flag == cb[rank-1][file-1].p->colour)
-			return &cb[rank-1][file-1];
-		else
-			;
-	}
-	if(cb[rank-1][file].p == NULL) //top
-		;	
-	else{
-		if(cb[rank-1][file].p->type == K && turn_flag == cb[rank-1][file].p->colour)
-			return &cb[rank-1][file];
-		else
-			;
-	}
-	if(cb[rank-1][file+1].p == NULL) //top right
-		;	
-	else{
-		if(cb[rank-1][file+1].p->type == K && turn_flag == cb[rank-1][file+1].p->colour)
-			return &cb[rank-1][file+1];
-		else
-			;
-	}
-	
-}
-
-struct square *pawn_finder(char *arr,int n,struct square cb[8][8]){
-	//check all 2 positions from pawn to behind
-int i,j,c1=0,c2=0,file,rank,qual1,qual2;		
-	
-	file = arr[0]-'a';
-	rank = (8-(arr[1]-'0'));
+struct piece *pawn_finder(int file, int rank, struct square cb[8][8]){
 	
 	if(turn_flag == 1){
-			if(cb[rank+1][file].p != NULL && cb[rank+1][file].p->type == P) //white pwn 1 behind	 
-				return &cb[rank+1][file];
-			
-			else if(cb[rank+2][file].p != NULL && cb[rank+2][file].p->type == P) //white pwn 2 behind	
-				return &cb[rank+2][file];	
-	
+			if(cb[rank+1][file].p != NULL && cb[rank+1][file].p->type == P) 	 
+				return (cb[rank+1][file]).p;
+			else if(cb[rank+2][file].p != NULL && cb[rank+2][file].p->type == P) 
+				return (cb[rank+2][file]).p;	
 			else
 				printf("Illegal move\n");								
 	}
-	
 	else if(turn_flag == 0){
-			if(cb[rank-1][file].p != NULL && cb[rank-1][file].p->type == P) //black pwn 1 behind
-					return &cb[rank-1][file];
-			
-			else if(cb[rank-2][file].p == NULL && cb[rank-2][file].p->type == P) //black pwn 2 behind
-					return &cb[rank-2][file];
-
+			if(cb[rank-1][file].p != NULL && cb[rank-1][file].p->type == P) 
+					return (cb[rank-1][file]).p;
+			else if(cb[rank-2][file].p != NULL && cb[rank-2][file].p->type == P) 
+					return (cb[rank-2][file]).p;
 			else 
 				printf("Illegal move\n");			
-		}
+	}
 }
 
-struct square *pawncapt_finder(char *arr , int n,struct square cb[8][8]){
-	
-int i,j,c1=0,c2=0,file,rank,qual1,qual2;		
-	
-	file = arr[2]-'a';
-	rank = (8-(arr[3]-'0'));		
-	qual1 = arr[0]-'a';	
-	
+struct piece *pawncapt_finder(int file, int rank, char qual, struct square cb[8][8]){
 	
 	if(turn_flag==0){
-		if(cb[rank-1][file-1].p != NULL && cb[rank-1][file-1].p->type == P && qual1 == file-1) 
-					return &cb[rank-1][file-1];
-				
-		else if(cb[rank-1][file+1].p != NULL && cb[rank-1][file+1].p->type == P && qual1 == file+1) 
-					return &cb[rank-1][file+1];
+		if(cb[rank-1][file-1].p != NULL && cb[rank-1][file-1].p->type == P && file-1 == (qual-'a')) 
+					return (cb[rank-1][file-1]).p;
+		else if(cb[rank-1][file+1].p != NULL && cb[rank-1][file+1].p->type == P && file+1 == (qual-'a')) 
+					return (cb[rank-1][file+1]).p;
 	}
-	
 	else if(turn_flag==1){ 
-		if(cb[rank+1][file-1].p != NULL && cb[rank+1][file-1].p->type == P && qual1 == file-1) 
-					return &cb[rank+1][file-1];
-				
-		else if(cb[rank+1][file+1].p != NULL && cb[rank+1][file+1].p->type == P && qual1 == file+1) 
-					return &cb[rank+1][file+1];
+		if(cb[rank+1][file-1].p != NULL && cb[rank+1][file-1].p->type == P && file-1 == (qual-'a')) 
+					return (cb[rank+1][file-1]).p;
+		else if(cb[rank+1][file+1].p != NULL && cb[rank+1][file+1].p->type == P && file+1 == (qual-'a')) 
+					return (cb[rank+1][file+1]).p;
 	}
+}	
+
+struct piece *source_finder(enum tpiece type, int file, int rank, char qual, struct square cb[8][8], int n){
+
+	int i,j,c1,c2,piece_arr_size;
+	int (*piece_arr)[2];
+	int max_file,max_rank,min_file,min_rank,file_inc,rank_inc;
+
+	switch(type){
+		case K:
+			piece_arr = king_arr;	
+			piece_arr_size = sizeof(king_arr)/sizeof(king_arr[0]);
+			break;
+		case Q:
+			piece_arr = queen_arr;	
+			piece_arr_size = sizeof(queen_arr)/sizeof(queen_arr[0]);
+			break;
+		case R:
+			piece_arr = rook_arr;	
+			piece_arr_size = sizeof(rook_arr)/sizeof(rook_arr[0]);
+			break;
+		case B:
+			piece_arr = bishop_arr;	
+			piece_arr_size = sizeof(bishop_arr)/sizeof(bishop_arr[0]);
+			break;
+		case N:
+			piece_arr = knight_arr;	
+			piece_arr_size = sizeof(knight_arr)/sizeof(knight_arr[0]);
+			break;
+		default:
+			;
+
+	}
+
+	c1 = file; 
+	c2 = rank; 		
+
+	for(i=0;i<piece_arr_size;i++){ 
+	    file = c1;
+        rank = c2;
+        if(type == K || type == N){     	        
+
+             file+= piece_arr[i][0]; 
+			 rank+= piece_arr[i][1]; 
+
+		 	 max_file = file+1; 
+			 max_rank = rank+1; 
+			 min_file = file-1; 
+			 min_rank = rank-1; 
+
+			 file_inc = rank_inc =1;	 
+		}	
+		else{
+			max_file = max_rank = 7;
+			min_file = min_rank = 0;
+			
+			file_inc = piece_arr[i][0];
+			rank_inc = piece_arr[i][1];
+		}
+		for(; file<=max_file && rank<=max_rank && file>=min_file && rank >=min_rank; file += file_inc, rank+= rank_inc){
+				if(cb[rank][file].p != NULL){
+					if(cb[rank][file].p->type == type && turn_flag == cb[rank][file].p->colour){
+						if(n==4){ 
+							if(islower(qual) && file == (qual-'a'))
+								return (cb[rank][file]).p;	
+							else if(rank == (8-(qual-'0')))
+								return (cb[rank][file]).p;
+							else
+								;			
+						}
+						else
+							return (cb[rank][file]).p;
+					}
+					else if(cb[rank][file].p->type != type)
+							break;
+						;
+			    }
+				else
+					;
+	    }
+	}
+    printf("Illegal move, try again\n"); 
+}	
 	
-}
-
-struct square *source_finder(char *arr,int n,struct square cb[8][8]){
-
-	 if(arr[1] == 'x')
-		return(pawncapt_finder(arr,n,cb));
-	else if(n==2)
-		return(pawn_finder(arr,n,cb));
-	else if(arr[0]=='R')
-		return(rook_finder(arr,n,cb));
-	else if (arr[0]=='B')
-		return(bishop_finder(arr,n,cb));
-	else if (arr[0]=='N')
-		return(knight_finder(arr,n,cb));
-	else if (arr[0]=='Q')
-		return(queen_finder(arr,n,cb));
-	else if (arr[0]=='K')
-		return(king_finder(arr,n,cb));		
-}
-
 void input (){
 	
-int i,n,file,rank;
-char c,dst_array[5];	
-struct piece *ptr1;
-struct square *ptr2;
+	int i,n,file,rank;
+	char c,qual,dst_arr[5];	
+	struct piece *ptr1;
+	struct square *ptr2;
 	
 	for(i=0;i<5;i++){
 		if((c=getchar())=='\n'){
-			dst_array[i]='\0';
+			dst_arr[i]='\0';
 			break;
 		}	
 		else if(c==EOF){
@@ -1068,35 +446,77 @@ struct square *ptr2;
 			break;
 		}
 		else{
-			dst_array[i]=c;
+			dst_arr[i]=c;
 			continue;
 		}		
 	}	
 	
-	n = strlen(dst_array);
-	
-	//printf("%c%c%c %d\n",dst_array[0] ,dst_array[1],dst_array[2],n); 
-	
-	ptr1 = (source_finder(dst_array , n ,cb))->p; //seg fault here
+	n = strlen(dst_arr);
 	
 	if(n==2){
-		file =  dst_array[0]-'a';
-		rank = (8-(dst_array[1]-'0'));
+		file = dst_arr[0]-'a';
+		rank = (8-(dst_arr[1]-'0'));
+		qual = -1;
 	}
-	else if(n==3){
-		file =  dst_array[1]-'a';
-		rank = (8-(dst_array[2]-'0'));
+	if(n==3){				
+		file = dst_arr[1]-'a';
+		rank = (8-(dst_arr[2]-'0'));
+		qual = -1;
 	}
-	else if(n==4){
-		file = dst_array[2]-'a';
-		rank = (8-(dst_array[3]-'0'));  
-	} 
-	
-	//printf("%d %d\n",file ,rank); 
+	else if(n==4){	
+		file = dst_arr[2]-'a';
+		rank = (8-(dst_arr[3]-'0'));
+		
+		if(dst_arr[1] == 'x')
+			qual = dst_arr[0];
+		else if(islower(dst_arr[1]))
+			qual = dst_arr[1];
+		else
+			qual = dst_arr[1];	
+	}
+		
+	switch(dst_arr[0]) {
+		case 'K':
+			type = K;
+			break;
+		case 'Q':
+			type = Q;
+		    break;	
+		case 'R':
+	   		type = R;
+			break;
+		case 'B':
+			type = B;
+			break;
+		case 'N':
+			type = N;
+			break;	
+		default:
+			type = P;
+		    break;
+	}
 
 	ptr2 = &cb[rank][file];
 	
-	make_move(ptr1,ptr2);
-	
+	if(type == P && n==2)
+		ptr1 = pawn_finder(file, rank, cb);
+	else if(type == P && n==4)
+		ptr1 = pawncapt_finder(file, rank, qual, cb);
+	else 	
+		ptr1 = source_finder(type, file, rank, qual, cb, n); 
+
+	make_move(ptr1,ptr2);	
 }
+/*
+	*****TODO Chess3.c*****
+- Piece checking outside board #1
+- Piece movement through other pieces #1
+- Pawn normal and capture move optimized logic
+- Special moves
+- Move testing
+- Illegal move detection and retry $1
+- Same colour piece capture
+- Pawn shoudl only move twice on first move
+
+*/
 
