@@ -444,7 +444,12 @@ void input (){
 	char c,qual,dst_arr[5];	
 	struct piece *ptr1;
 	struct square *ptr2;
-	
+
+    if(turn_flag == 1)
+        printf("Enter move as white -\n");
+    else
+        printf("Enter move as black -\n");
+
 	for(i=0;i<5;i++){
 		if((c=getchar())=='\n'){
 			dst_arr[i]='\0';
