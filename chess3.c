@@ -3,6 +3,7 @@
 #include<stdbool.h>
 #include<ctype.h>
 #include<string.h>
+#include<unistd.h>
 
 struct square{
 	bool present;
@@ -207,7 +208,7 @@ int knight_arr[8][2]={
 };
 
 void print_board(struct square board[8][8]);
-void input();
+struct piece *input();
 char convert(enum tpiece type);
 
 int program_stop=0;
@@ -224,19 +225,19 @@ int main(){
 		}
 		else { 
 			if(turn_flag==1){
-				printf("Enter move as white -\n");
-				input();
-				printf("\n");
 				print_board(cb);
 				printf("\n");
+				input(); 
+		    //	system("clear");
+                sleep(1);    
 				turn_flag = 0;
 			}
 			else if(turn_flag==0){
-				printf("Enter move as black -\n");
-				input();
-				printf("\n");
-				print_board(cb);
-				printf("\n");
+	    		print_board(cb);
+		    	printf("\n");
+		    	input();     
+             // system("clear");
+                sleep(1);              
 				turn_flag = 1;
 		   	}
 		}
@@ -245,17 +246,16 @@ int main(){
 
 void print_board(struct square board[8][8]){
 
-int i,j;  
-char c;
+    int i,j;  
+    char c;
 
-	for(i=0;i<9;i++){
-		if(i != 8)
-			printf("%d  ",(8-i));
-		
+    printf("\n");    
+
+	for(i=0;i<9;i++){		
 		if(i==8){
 			for(j=0;j<9;j++){
 				if(j==0)
-					printf("   ");
+					printf("    ");
 				else
 					printf("%c  ",('a'+j-1));					
 				if(j==8)
@@ -263,7 +263,8 @@ char c;
 			}
 		}
 		else{
-			for(j=0;j<8;j++){
+		    printf(" %d  ",(8-i));
+            for(j=0;j<8;j++){
 				if(board[i][j].present){
 					if(board[i][j].p->colour == 0)
 						printf("B%c ",convert(board[i][j].p->type));
@@ -318,17 +319,21 @@ struct piece *pawn_finder(int file, int rank, struct square cb[8][8]){
 				return (cb[rank+1][file]).p;
 			else if(cb[rank+2][file].p != NULL && cb[rank+2][file].p->type == P) 
 				return (cb[rank+2][file]).p;	
-			else
+			else{
 				printf("Illegal move\n");								
-	}
+                return NULL;           
+            }         
+     }
 	else if(turn_flag == 0){
 			if(cb[rank-1][file].p != NULL && cb[rank-1][file].p->type == P) 
 					return (cb[rank-1][file]).p;
 			else if(cb[rank-2][file].p != NULL && cb[rank-2][file].p->type == P) 
 					return (cb[rank-2][file]).p;
-			else 
-				printf("Illegal move\n");			
-	}
+			else{ 
+				printf("Illegal move\n");
+                return NULL;            
+            }
+    }
 }
 
 struct piece *pawncapt_finder(int file, int rank, char qual, struct square cb[8][8]){
@@ -385,7 +390,7 @@ struct piece *source_finder(enum tpiece type, int file, int rank, char qual, str
     
     if(cb[rank][file].p != NULL && cb[rank][file].p->colour == turn_flag){
         printf("Can't capture own pieces, try again\n");
-        return 0;
+        return NULL;
     }    
     else
         ;
@@ -435,10 +440,10 @@ struct piece *source_finder(enum tpiece type, int file, int rank, char qual, str
 	    }
 	}
     printf("Piece couldn't be found, try again\n");
-    return 0; 
+    return NULL; 
 }	
 	
-void input (){
+struct piece *input (){
 	
 	int i,n,file,rank;
 	char c,qual,dst_arr[5];	
@@ -519,8 +524,15 @@ void input (){
 	else 	
 		ptr1 = source_finder(type, file, rank, qual, cb, n); 
 
-	make_move(ptr1,ptr2);	
+    if(ptr1 != NULL)
+        make_move(ptr1, ptr2);
+    else{
+        printf("\n");
+        ptr1 = input();
+    }
+
+    return NULL;
+
 }
 
-
-
+	
