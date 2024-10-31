@@ -561,30 +561,29 @@ char (*input_packager(FILE *fp, char move_set[50][15]))[15]{
                 space_counter=char_counter=0;
                 //printf("|");
             }
-            if(input == ' '){
+            if(input == ' ' || input == '\n'){
                 space_counter++;
-            }
-            if(input == '\n'){
-                continue;
             }
             if(char_counter<15 && input != '.' && space_counter>=1 && space_counter<3){
                 move_set[move_counter][char_counter] = input;
-                printf("%c",move_set[move_counter][char_counter]);
+                //printf("%c",move_set[move_counter][char_counter]);
                 char_counter++;
             }           
         }
     }
-    /*
+   /* 
     printf("\n");
     for(i=1;i<50;i++){
-        for(j=0;j<6;j++){
+        for(j=0;j<12;j++){
             move_set[i][j]=move_set[i][j+1];
             printf("%c",move_set[i][j]);
         }
+        printf("\n");
     }
-    //printf("%c",move_set[move_counter][char_counter]);
-    */
+    
+    printf("\n");
     return move_set;
+   */ 
 }    
 
 //void packet_reader(char (*)[15]){
