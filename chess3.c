@@ -224,7 +224,7 @@ int main(int argc, char *argv[]){
     if(argc == 2){
         FILE *fp = fopen(argv[1], "r");        
         char (*ptr)[15]=input_packager(fp, move_set);        
-        void packet_reader(char (*)[15]);
+        //void packet_reader(char (*)[15]);
         fclose(fp);    
     }
     else{
@@ -587,6 +587,6 @@ char (*input_packager(FILE *fp, char move_set[50][15]))[15]{
     return move_set;
 }    
 
-void packet_reader(char (*)[15]){
+//void packet_reader(char (*)[15]){
     
-}
+//}
