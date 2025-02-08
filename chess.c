@@ -1,28 +1,39 @@
 /*
-           ** Feature issues **
+ ** Feature issues **
 //Pinnned piece detection
-//Discovered attack moves detection
+//Discoveredered attack moves detection
 //Check and Checkmate implementation
-//Pawn promotion
+//Pawn promo_sym
 //Move card
 //Special moves(En-passant,Castling) implementation
 //Move retract function
+//Game conclusion DRAW due to 50 move rule, 3 fold repetition , Insufficient material , stalemate , etc ..
 
-            ** Validation issues **
-//Double Discovered check using en passant possible
+ ** Validation issues **
+//Double discoveredered check using en passant possible
 //Smothers checkmate
-//Yet to add general_verif() 
+//Cross check
 
-            ** Legality issues **
+ ** Legality issues **
 //Unrelated input producing seg fault instead of proper error
 //Unrelated input for white piece producing wrong error
 //Error production is incorrect in a lot of cases for both colors
 
-            **Miscallenous issues **
+ **Miscallenous issues **
 //Pawn logic could be better
 //Could use less global variables
 //Create program that feeds input through file and can also parse it
+//Checkmate patterns possible similar to checkin patterns
+//Promotion plus check/checkmate creates new patterns
+//Pieces should not be able to capture king
 
+**TOMMOROW**
+Replicate all modifications of general_verif() in rest of the functions
+Write retract_move(),it should retrace game till start (Maybe we can use retract in many verif() functions)
+Add promotion feature
+Add checkmate feature
+double check and its consquences
+Maybe source finder individual validations needed in other functions too??
 */
 
 #include<stdio.h>
@@ -32,59 +43,58 @@
 #include<string.h>
 #include<unistd.h>
 
-enum tpiece{
+enum piece_type{
     K,Q,R,B,N,P
 }type;
 
 struct piece{
     int color;
     struct square *sqr;
-    enum tpiece type;
+    enum piece_type type;
 } BR1={-1,NULL,R}, 
-    BN1={-1,NULL,N},
-    BB1={-1,NULL,B},
-    BQ={-1,NULL,Q},
-    BK={-1,NULL,K},
-    BB2={-1,NULL,B},
-    BN2={-1,NULL,N},
-    BR2={-1,NULL,R},
-    BP1={-1,NULL,P},
-    BP2={-1,NULL,P},
-    BP3={-1,NULL,P},
-    BP4={-1,NULL,P},
-    BP5={-1,NULL,P}, 
-    BP6={-1,NULL,P},
-    BP7={-1,NULL,P}, 
-    BP8={-1,NULL,P},
-    WP1={1,NULL,P},
-    WP2={1,NULL,P},
-    WP3={1,NULL,P},
-    WP4={1,NULL,P},
-    WP5={1,NULL,P},
-    WP6={1,NULL,P},
-    WP7={1,NULL,P},
-    WP8={1,NULL,P},
-    WR1={1,NULL,R},
-    WN1={1,NULL,N},
-    WB1={1,NULL,B},
-    WQ={1,NULL,Q},
-    WK={1,NULL,K},
-    WB2={1,NULL,B},
-    WN2={1,NULL,N},
-    WR2={1,NULL,R}; 
+  BN1={-1,NULL,N},
+  BB1={-1,NULL,B},
+  BQ={-1,NULL,Q},
+  BK={-1,NULL,K},
+  BB2={-1,NULL,B},
+  BN2={-1,NULL,N},
+  BR2={-1,NULL,R},
+  BP1={-1,NULL,P},
+  BP2={-1,NULL,P},
+  BP3={-1,NULL,P},
+  BP4={-1,NULL,P},
+  BP5={-1,NULL,P}, 
+  BP6={-1,NULL,P},
+  BP7={-1,NULL,P}, 
+  BP8={-1,NULL,P},
+  WP1={1,NULL,P},
+  WP2={1,NULL,P},
+  WP3={1,NULL,P},
+  WP4={1,NULL,P},
+  WP5={1,NULL,P},
+  WP6={1,NULL,P},
+  WP7={1,NULL,P},
+  WP8={1,NULL,P},
+  WR1={1,NULL,R},
+  WN1={1,NULL,N},
+  WB1={1,NULL,B},
+  WQ={1,NULL,Q},
+  WK={1,NULL,K},
+  WB2={1,NULL,B},
+  WN2={1,NULL,N},
+  WR2={1,NULL,R}; 
 
 struct square{
     bool present;
     struct piece *p;
 }cb[8][8];
 
-void init(){
+void square_init(){
 
-    int i,j;
-    for(i=2;i<6;i++){
-        for(j=0;j<8;j++){
-            cb[i][j].present=0;
-            cb[i][j].p = NULL;
+    for(int rank=2;rank<6;rank++){
+        for(int file=0;file<8;file++){
+            cb[rank][file].present=0;
+            cb[rank][file].p = NULL;
         }
     }
 
@@ -248,56 +258,59 @@ int black_pawn_arr[4][2]={
 };
 
 struct metrics{
-    enum tpiece type;
+    enum piece_type type;
     int dst_file;
     int dst_rank;
     int src_file;
     int src_rank;
     bool check_sym;
     bool checkmate_sym;
-    bool capture;
-    bool promotion;
-    enum tpiece promo_piece;
+    bool capture_sym;
+    bool promo_sym;
+    enum piece_type promo_piece;
 }cmet;
 
 void init_cmet(){
+    cmet.type = -1;
     cmet.dst_file = -1;
     cmet.dst_rank = -1;
     cmet.src_file = -1;
     cmet.src_rank = -1;
     cmet.check_sym = false;
     cmet.checkmate_sym = false;
-    cmet.capture = false;
-    cmet.promotion = false;
+    cmet.capture_sym = false;
+    cmet.promo_sym = false;
     cmet.promo_piece = -1;
 }
 
-static int *col;
-static int *row;
-static int (*move_arr)[2];
-static int *move_arr_size;
-
-int input();
+int input(void);
 void piece_parser(char*);
 void pawn_parser(char*);
-struct piece* source_finder(); 
+struct piece* source_finder(int,int,enum type,int(*)[2],int,int,int); 
 void make_move(struct piece*, struct square*);
-char convert(enum tpiece);
+char convert(enum piece_type);
 void output(struct square [8][8]);
-bool check_verif(int ,int ,int (*)[2],int);
-bool postfix_verif();
+bool check_verif(int,int,enum type,int(*)[2],int);
+bool checkmate_verif(int,int,int(*)[2],int);
+bool discovered_check_verif(int,int,int,int);
+bool postfix_verif(int,int,enum type,int(*)[2],int);
+bool general_verif(void); 
 
-
+static struct piece *prev_move_piece = NULL;
+static struct square *prev_move_sqr = NULL;
+bool double_check = false;
 bool check_state = false;
-bool checkmate_state = false;
 int turn_flag = 1;
+bool program_stop = false;
 
 int main(int argc, char *argv[]){ 
 
-    init();    
+    square_init();    
     while(1){
         init_cmet();
         if(input()){
+            if(program_stop == true)
+                break;
             continue;
         }
         output(cb);
@@ -311,7 +324,7 @@ void piece_parser(char *inp_arr){
 
     int len = strlen(inp_arr);
 
-    cmet.promotion=false;
+    cmet.promo_sym=false;
     cmet.promo_piece = -1;
 
     switch(inp_arr[0]) {
@@ -342,7 +355,7 @@ void piece_parser(char *inp_arr){
             rank_index[rank_qty-1]=inp_arr[i];
         }
         else if(inp_arr[i] == 'x'){
-            cmet.capture = true;
+            cmet.capture_sym = true;
         }
         else if(inp_arr[i] == '+'){
             cmet.check_sym = true;
@@ -368,7 +381,7 @@ void piece_parser(char *inp_arr){
     }
 }
 
-void pawn_parser(char *inp_arr){ //hxf3=Q+
+void pawn_parser(char *inp_arr){ 
 
     int file_qty=0;
     char file_index[2];
@@ -387,7 +400,7 @@ void pawn_parser(char *inp_arr){ //hxf3=Q+
             cmet.dst_rank = 8-(inp_arr[i]-'0');
         }
         else if(inp_arr[i] == 'x'){
-            cmet.capture = true;
+            cmet.capture_sym = true;
         }
         else if(inp_arr[i] == '+'){
             cmet.check_sym = true;
@@ -396,7 +409,7 @@ void pawn_parser(char *inp_arr){ //hxf3=Q+
             cmet.checkmate_sym = true;
         }
         else if(inp_arr[i] == '='){
-            cmet.promotion = true;
+            cmet.promo_sym = true;
         }
         else if(isupper(inp_arr[i])){
             cmet.promo_piece = inp_arr[i];
@@ -436,22 +449,54 @@ int input(){
     }
 
     if(isupper(inp_arr[0])){
-        piece_parser(inp_arr);//Nf3xd4#  
+        piece_parser(inp_arr);
     }
     else if(islower(inp_arr[0])){
-        pawn_parser(inp_arr);//hxf3=Q#
-    }
-
-    if(check_state == true){
-        if(check_verif(*row,*col,move_arr,*move_arr_size)){
-            printf("Invalid move(King is in check),Please try again\n");
-            return 1;
-        }
-        else
-            check_state = false;
+        pawn_parser(inp_arr);
     }
     
-    if((piece_ptr = source_finder()) == NULL||(postfix_verif() == false)){
+    int file = cmet.dst_file;
+    int rank = cmet.dst_rank;
+    int src_file = cmet.src_file;
+    int src_rank = cmet.src_rank;
+    enum type move_piece = cmet.type;
+
+    int (*piece_arr)[2];
+    int piece_arr_size;
+
+    switch(cmet.type){
+        case K:
+            piece_arr = king_arr;
+            piece_arr_size = 8;
+            break;
+        case Q:
+            piece_arr = queen_arr;
+            piece_arr_size = 8;
+            break;
+        case R:
+            piece_arr = rook_arr;
+            piece_arr_size = 4;
+            break;
+        case B:
+            piece_arr = bishop_arr;
+            piece_arr_size = 4;
+            break;
+        case N:
+            piece_arr = knight_arr;
+            piece_arr_size = 8;
+            break;
+        case P:
+            if(turn_flag == 1)
+                piece_arr = white_pawn_arr;
+            else
+                piece_arr = black_pawn_arr;
+            piece_arr_size = 4;
+            break;
+        default:
+            return NULL;
+    }
+    if((piece_ptr = source_finder(file,rank,move_piece,piece_arr,piece_arr_size,src_file,src_rank)) == NULL||
+            (postfix_verif(file,rank,piece_arr,piece_arr_size) == false)||(general_verif() == false)){
         printf("Invalid move ,Please try again\n");
         return 1;
     }
@@ -465,76 +510,175 @@ int input(){
     return 0;
 }
 
-struct piece *source_finder(){
+struct piece *source_finder(int file,int rank,enum move_piece,int (*piece_arr)[2],int piece_arr_size,int src_file,int src_rank){
 
-    int file,rank,piece_arr_size;
-    int (*piece_arr)[2];
     int inner_max_file,inner_max_rank,inner_min_file,inner_min_rank;
     int outer_max_file,outer_max_rank,outer_min_file,outer_min_rank;
 
-    int og_dst_file = file = cmet.dst_file;
-    int og_dst_rank = rank = cmet.dst_rank;
+    int og_dst_file = file;
+    int og_dst_rank = rank;
 
     if(cb[rank][file].p != NULL && cb[rank][file].p->color == turn_flag){
-        printf("Can't capture own pieces, try again\n");                   
+        printf("Can't capture_sym own pieces, try again\n");                   
         return NULL;
     }
 
-        switch(cmet.type){
-            case K:
-                piece_arr = king_arr;
-                piece_arr_size = 8;
-                break;
-            case Q:
-                piece_arr = queen_arr;
-                piece_arr_size = 8;
-                break;
-            case R:
-                piece_arr = rook_arr;
-                piece_arr_size = 4;
-                break;
-            case B:
-                piece_arr = bishop_arr;
-                piece_arr_size = 4;
-                break;
-            case N:
-                piece_arr = knight_arr;
-                piece_arr_size = 8;
-                break;
-            case P:
-                if(turn_flag == 1)
-                    piece_arr = white_pawn_arr;
-                else
-                    piece_arr = black_pawn_arr;
-                piece_arr_size = 4;
-                break;
-            default:
-                return NULL;
-        }
-        
-        for(int i=0;i<piece_arr_size;i++){
-            file = og_dst_file;
-            rank = og_dst_rank;
-            
-            if(cmet.type == K || cmet.type == N || cmet.type == P){
-                if(cmet.type == P){
-                    if(cmet.capture == false && ((rank == 4 && turn_flag == 1)||(rank == 3 && turn_flag == -1)))
-                        piece_arr_size = 2;                    
-                    else if(cmet.capture == true){
-                        if(i<2)
-                            continue;
-                    }
-                    else 
-                        i=0;
-                
-                    if(cb[rank][file].p != NULL && cb[rank][file].p->color != turn_flag && cmet.capture == false){
-                        return NULL;
-                    }
+    for(int i=0;i<piece_arr_size;i++){
+        file = og_dst_file;
+        rank = og_dst_rank;
+
+        if(move_piece == K || move_piece == N || move_piece == P){
+            if(cmet.type == P){
+                if(cmet.capture_sym == false && ((rank == 4 && turn_flag == 1)||(rank == 3 && turn_flag == -1)))
+                    piece_arr_size = 2;                    
+                else if(cmet.capture_sym == true){
+                    if(i<2)
+                        continue;
                 }
+                else 
+                    i=0;
 
-                file+= piece_arr[i][0];
-                rank+= piece_arr[i][1];
+                if(cb[rank][file].p != NULL && cb[rank][file].p->color != turn_flag && cmet.capture_sym == false){
+                    return NULL;
+                }
+            }
 
+            file+= piece_arr[i][0];
+            rank+= piece_arr[i][1];
+
+            inner_max_file = file+1; 
+            inner_max_rank = rank+1;
+            inner_min_file = file-1;
+            inner_min_rank = rank-1;
+        }
+        else{
+            inner_max_file = inner_max_rank = 8;
+            inner_min_file = inner_min_rank = -1;
+        }
+
+        outer_max_file = outer_max_rank = 8;
+        outer_min_file = outer_min_rank = -1;
+
+        if(cb[og_dst_rank][og_dst_file].p != NULL && cb[og_dst_rank][og_dst_file].p->color != turn_flag && cmet.capture_sym == false){
+            return NULL;
+        }
+
+        for(;file<inner_max_file && file<outer_max_file && rank<inner_max_rank && rank<outer_max_rank && 
+                file>inner_min_file && file>outer_min_file && rank >inner_min_rank && rank>outer_min_rank
+                ;file += piece_arr[i][0], rank+=piece_arr[i][1]){
+            if(cb[rank][file].p != NULL && (file != og_dst_file || rank != og_dst_rank)){
+                if(cb[rank][file].p->color == turn_flag && cb[rank][file].p->type == move_piece){
+                    if((cmet.src_file != -1 && cmet.src_rank != -1 && cmet.src_file == file && cmet.src_rank == rank)||
+                            (cmet.src_file != -1 && cmet.src_file == file)||(cmet.src_rank != -1 && cmet.src_rank == rank)||
+                            (cmet.src_file == -1 && cmet.src_rank == -1))
+                        return cb[rank][file].p;
+                    else
+                        return NULL;
+                }
+                else
+                    break;
+            }
+        }
+        if(move_piece == P && cmet.capture_sym == false && ((og_dst_rank != 4 && turn_flag == 1)||(og_dst_rank != 3 && turn_flag == -1))){
+            printf("Invalid move(Piece(Pawn) could not be found), try again\n");
+            return NULL;
+        }
+    }
+    printf("Invalid move(Piece could not be found), try again\n");
+    return NULL;
+}
+
+bool postfix_verif(int file,int rank,enum move_piece,int(*piece_arr)[2],int piece_arr_size){
+
+    if(cmet.check_sym == true){
+        if(check_verif(file,rank,move_piece,piece_arr,piece_arr_size)){
+            check_state = true;
+            return true;
+        }
+        else
+            return false;
+    }
+    /*
+    if(cmet.checkmate_sym == true){
+        if(checkmate_verif(file,rank,piece_arr,piece_arr_size)){
+            printf("CHECKMATE ,GAME IS OVER\n")
+            program_stop = true;
+            return true;
+        }
+        else
+            return false;
+    }
+    */
+    else 
+        return true;
+}
+
+bool general_verif(void){
+    //1)King should not be in check after your move has been played
+    //
+
+    int file,rank,king_file,king_rank;
+    int inner_max_file,inner_max_rank,inner_min_file,inner_min_rank;
+    int outer_max_file,outer_max_rank,outer_min_file,outer_min_rank;
+    enum piece_type defend_piece;
+    int (*piece_arr)[2],piece_arr_size;
+
+    int (*piece_array_list[6])[2]={king_arr,queen_arr,rook_arr,bishop_arr,knight_arr};
+
+    for(rank=0;rank<8;rank++){
+        for(file=0;file<8;file++){
+            if(cb[rank][file].p != NULL && cb[rank][file].p->type == K && cb[rank][file].p->color == turn_flag){
+                king_file = file;
+                king_rank = rank;
+                break;
+            }
+        }
+    }
+    
+    if(turn_flag == 1)
+        piece_array_list[5]=black_pawn_arr;
+    else
+        piece_array_list[5]=white_pawn_arr;
+
+    for(int i=0;i<6;i++){
+        
+        piece_arr = *(piece_array_list + i);
+        piece_arr_size = sizeof(piece_arr)/sizeof(piece_arr[0]);
+        
+        switch(i){
+            case 0:
+                defend_piece = K;
+                break;
+            case 1:
+                defend_piece = Q;
+                break;
+            case 2:
+                defend_piece = R;
+                break;
+            case 3:
+                defend_piece = B;
+                break;
+            case 4:
+                defend_piece = N;
+                break;
+            case 5:
+                defend_piece = P;
+                break;
+        }        
+        
+        for(int j=0;j<piece_arr_size;j++){
+            
+            file = king_file;
+            rank = king_rank;
+
+            if(defend_piece == K || defend_piece == N || defend_piece == P){
+                if(defend_piece == P && j<2){
+                    continue;
+                }
+                
+                file+= piece_arr[j][0];
+                rank+= piece_arr[j][1];
+                
                 inner_max_file = file+1; 
                 inner_max_rank = rank+1;
                 inner_min_file = file-1;
@@ -547,91 +691,22 @@ struct piece *source_finder(){
 
             outer_max_file = outer_max_rank = 8;
             outer_min_file = outer_min_rank = -1;
-
-            if(cb[og_dst_rank][og_dst_file].p != NULL && cb[og_dst_rank][og_dst_file].p->color != turn_flag && cmet.capture == false){
-                return NULL;
-            }
-
+            
             for(;file<inner_max_file && file<outer_max_file && rank<inner_max_rank && rank<outer_max_rank && 
-                 file>inner_min_file && file>outer_min_file && rank >inner_min_rank && rank>outer_min_rank
-                ;file += piece_arr[i][0], rank+=piece_arr[i][1]){
-                if(cb[rank][file].p != NULL && (file != og_dst_file || rank != og_dst_rank)){
-                    if(cb[rank][file].p->color == turn_flag && cb[rank][file].p->type == cmet.type){
-                        if((cmet.src_file != -1 && cmet.src_rank != -1 && cmet.src_file == file && cmet.src_rank == rank)||
-                           (cmet.src_file != -1 && cmet.src_file == file)||(cmet.src_rank != -1 && cmet.src_rank == rank)||
-                           (cmet.src_file == -1 && cmet.src_rank == -1))
-                            return cb[rank][file].p;
-                        else
-                        return NULL;
+                    file>inner_min_file && file>outer_min_file && rank>inner_min_rank && rank>outer_min_rank
+                    ;file += piece_arr[j][0], rank+=piece_arr[j][1]){
+                if(cb[rank][file].p != NULL && (file != king_file || rank != king_rank)){
+                    if(cb[rank][file].p->color != turn_flag && cb[rank][file].p->type == defend_piece){
+                        printf("King is still in check\n");
+                        return false;
                     }
                     else
                         break;
                 }
-                else
-                    continue;
-            }
-            if(cmet.type == P && cmet.capture == false && ((og_dst_rank != 4 && turn_flag == 1)||(og_dst_rank != 3 && turn_flag == -1))){
-                printf("Invalid move(Piece(Pawn) could not be found), try again\n");
-                return NULL;
             }
         }
-        printf("Invalid move(Piece could not be found), try again\n");
-        return NULL;
-}
-
-bool postfix_verif(){
-
-    int file = cmet.dst_file;
-    int rank = cmet.dst_rank;
-
-    int (*piece_arr)[2];
-    int piece_arr_size;
-
-    switch(cmet.type){
-        case K:
-            piece_arr = king_arr;
-            piece_arr_size = sizeof(king_arr)/sizeof(king_arr[0]);
-            break;
-        case Q:
-            piece_arr = queen_arr;
-            piece_arr_size = sizeof(queen_arr)/sizeof(queen_arr[0]);
-            break; 
-       case R:
-            piece_arr = rook_arr;
-            piece_arr_size = sizeof(rook_arr)/sizeof(rook_arr[0]);
-            break;
-       case B:
-            piece_arr = bishop_arr;
-            piece_arr_size = sizeof(bishop_arr)/sizeof(bishop_arr[0]);
-            break;
-       case N:
-            piece_arr = knight_arr;
-            piece_arr_size = sizeof(knight_arr)/sizeof(knight_arr[0]);
-            break;
     }
-
-    if(cmet.check_sym == true){
-        if(check_verif(file,rank,&piece_arr[2],piece_arr_size)){
-            check_state = true;
-            return true;
-        }
-        else
-            return false;
-    }
-    else
-        return true;
-    /*
-    else if(cmet.checkmate_sym == true){
-        if(checkmate_verif(file,rank,(*piece_arr)[2],piece_arr_size))
-            checkamte_state = true;
-            return true;
-        }
-        else
-            return false;
-    }
-    else 
-        return true;
-    */
+   return true;
 }
 
 void make_move(struct piece *p, struct square *dst){
@@ -649,7 +724,7 @@ void make_move(struct piece *p, struct square *dst){
     dst->p = p;
 }
 
-char convert(enum tpiece type){
+char convert(enum piece_type type){
     switch(type) {
         case K:
             return 'K';
@@ -702,9 +777,10 @@ void output(struct square board[8][8]){
     printf("\n");
 }
 
-bool check_verif(int file, int rank, int (*piece_arr)[2], int piece_arr_size){ 
+bool check_verif(int file,int rank,enum move_piece,int(*piece_arr)[2],int piece_arr_size){ 
 
-// File and Rank are source file and rank of given piece which are confirmed
+    int og_dst_file = file;
+    int og_dst_rank = rank;
 
     int inner_max_file,inner_max_rank,inner_min_file,inner_min_rank;
     int outer_max_file,outer_max_rank,outer_min_file,outer_min_rank;
@@ -712,19 +788,19 @@ bool check_verif(int file, int rank, int (*piece_arr)[2], int piece_arr_size){
     for(int i=0;i<piece_arr_size;i++){
         file = og_dst_file;
         rank = og_dst_rank;
-            
-        if(cmet.type == K || cmet.type == N || cmet.type == P){
-            if(cmet.type == P){
-                if(cmet.capture == false && ((rank == 4 && turn_flag == 1)||(rank == 3 && turn_flag == -1)))
+
+        if(move_piece == K || move_piece == N || move_piece == P){
+            if(move_piece == P){
+                if(cmet.capture_sym == false && ((rank == 4 && turn_flag == 1)||(rank == 3 && turn_flag == -1)))
                     piece_arr_size = 2;                    
-                else if(cmet.capture == true){
+                else if(cmet.capture_sym == true){
                     if(i<2)
                         continue;
                 }
                 else 
                     i=0;
-                
-                if(cb[rank][file].p != NULL && cb[rank][file].p->color != turn_flag && cmet.capture == false)
+
+                if(cb[rank][file].p != NULL && cb[rank][file].p->color != turn_flag && cmet.capture_sym == false)
                     return NULL;
             }
 
@@ -745,49 +821,171 @@ bool check_verif(int file, int rank, int (*piece_arr)[2], int piece_arr_size){
         outer_min_file = outer_min_rank = -1;
 
         for(;file<inner_max_file && file<outer_max_file && rank<inner_max_rank && rank<outer_max_rank && 
-             file>inner_min_file && file>outer_min_file && rank >inner_min_rank && rank>outer_min_rank
-            ;file += piece_arr[i][0], rank+=piece_arr[i][1]){
+                file>inner_min_file && file>outer_min_file && rank>inner_min_rank && rank>outer_min_rank
+                ;file += piece_arr[i][0], rank+=piece_arr[i][1]){
             if(cb[rank][file].p != NULL){
-                if(cb[rank][file].p->color != turn_flag && cb[rank][file].p->type == K)
+                if(cb[rank][file].p->color != turn_flag && cb[rank][file].p->type == K){
+                    if(discovered_check_verif(og_dst_file,og_dst_rank,file,rank))
+                        double_check = true;
                     return true;
+                }
                 else
                     break;
             }
         }
-        return false;
     }
+
+    if(discovered_check_verif(og_dst_file,og_dst_rank,file,rank))
+        return true;
+    else
+        return false;
+}
+
+bool discovered_check_verif(int file,int rank,int king_file,int king_rank){
+    
+    int king_file,king_rank;
+    enum piece_type discovered_piece;
+    int inner_max_file,inner_max_rank,inner_min_file,inner_min_rank;
+    int outer_max_file,outer_max_rank,outer_min_file,outer_min_rank;
+    
+    int ghost_file = file;
+    int ghost_rank = rank;
+
+    int(*piece_array_list[5])[2]={king_arr,queen_arr,rook_arr,bishop_arr,knight_arr};
+
+    for(int i=0;i<5;i++){
+        file = king_file;
+        rank = king_rank;
+        piece_arr = *(piece_array_list+i);
+        piece_arr_size = sizeof(piece_arr)/sizeof(piece_arr[0]);
+
+        switch(i){
+            case 0:
+                discovered_piece = K;
+                break;
+            case 1:
+                discovered_piece = Q;
+                break;
+            case 2:
+                discovered_piece = R;
+                break;
+            case 3:
+                discovered_piece = B;
+                break;
+            case 4:
+                discovered_piece = N;
+                break;
+        }        
+            
+        for(int j=0;j<piece_arr_size;i++){
+            if(discovered_piece == K || discovered_piece == N){
+                file+= piece_arr[j][0];
+                rank+= piece_arr[j][1];
+                inner_max_file = file+1; 
+                inner_max_rank = rank+1;
+                inner_min_file = file-1;
+                inner_min_rank = rank-1;
+            }
+            else{
+                inner_max_file = inner_max_rank = 8;
+                inner_min_file = inner_min_rank = -1;
+            }
+
+            outer_max_file = outer_max_rank = 8;
+            outer_min_file = outer_min_rank = -1;
+
+            for(;file<inner_max_file && file<outer_max_file && rank<inner_max_rank && rank<outer_max_rank && 
+                    file>inner_min_file && file>outer_min_file && rank>inner_min_rank && rank>outer_min_rank
+                    ;file += piece_arr[j][0], rank+=piece_arr[j][1]){
+                if(cb[rank][file].p != NULL){
+                    if(cb[rank][file].p->color != turn_flag && cb[rank][file].p->type == discovered_piece && file != ghost_file && rank != ghost_rank)
+                        return true;
+                    else if(rank == ghost_rank && file == ghost_file)
+                        continue;
+                    else
+                        break;
+                }
+            }
+        }
+    }
+    return false;
 }
 
 /*
-bool checkmate_verif(int file, int rank, int (*piece_arr)[2], int piece_arr_size){
+bool checkmate_verif(){
 
-    //Check if king can move
-    //Check if attacking piece can be captured
-    //Check if defending piece can be relocated on the path
+    int inner_max_file,inner_max_rank,inner_min_file,inner_min_rank;
+    int outer_max_file,outer_max_rank,outer_min_file,outer_min_rank;
+    enum piece_type defend_piece;
 
-    //Loop between all the piece arrays
-    //Piece to arrive can be any
-    //Piece on dst_sqr will be a peice of opp color
+    enum piece_type attack_piece = cmet.type;
+    int attack_piece_file = cmet.dst_file;
+    int attack_piece_rank = cmet.dst_rank;
 
-    int i,j;
-    int piece_file = file;
-    int piece_rank = rank;
+    int (*piece_array_list[6])[2]={king_arr,queen_arr,rook_arr,bishop_arr,knight_arr};
+    
+    if(turn_flag == 1)
+        piece_array_list[5]=black_pawn_arr;
+    else
+        piece_array_list[5]=white_pawn_arr;
 
-    if(check_verif(file,rank,(*piece_arr)[2],piece_arr_size) == false){
-        return false;
-    }
+    switch(piece_arr){
+        case king_arr:
+            defend_piece = K;
+            break;
+        case queen_arr:
+            defend_piece = Q;
+            break;
+        case rook_arr:
+            defend_piece = R;
+            break;
+        case bishop_arr:
+            defend_piece = B;
+            break;
+        case knight_arr:
+            defend_piece = N;
+            break;
+        case white_pawn_arr:
+            defend_piece = P
+            break;
+        case black_pawn_arr:
+            defend_piece = P;
+            break;
+    }        
 
-    for(i=-1;i<2;i++){
-        for(j=-1;j<2;j++){
-            file = king_file+i;
-            rank = king_rank+j;
-            if(file<8 && file>-1 && rank<8 && rank>0 && cb[file][rank].p == NULL){
-                return false;
+    for(int i=0;i<6;i++){  
+        file = attack_piece_file;
+        rank = attack_piece_rank;
+
+        if(defend_piece == K || defend_piece == N){
+            file+= piece_arr[i][0];
+            rank+= piece_arr[i][1];
+            inner_max_file = file+1; 
+            inner_max_rank = rank+1;
+            inner_min_file = file-1;
+            inner_min_rank = rank-1;
+        }
+        else{
+            inner_max_file = inner_max_rank = 8;
+            inner_min_file = inner_min_rank = -1;
+        }
+
+        outer_max_file = outer_max_rank = 8;
+        outer_min_file = outer_min_rank = -1;
+        
+        for(;file<inner_max_file && file<outer_max_file && rank<inner_max_rank && rank<outer_max_rank && 
+                file>inner_min_file && file>outer_min_file && rank>inner_min_rank && rank>outer_min_rank
+                ;file += piece_arr[i][0], rank+=piece_arr[i][1]){
+            if(cb[rank][file].p != NULL){
+                if(cb[rank][file].p->color != turn_flag && cb[rank][file].p->type != defend_piece && cmet.capture_sym != true){
+                    return true;
+                }
+                else
+                    break;
             }
-            else
-                continue;
         }
     }
+   return false;
 }
-
 */
+
