@@ -28,10 +28,7 @@
 //Pieces should not be able to capture king
 
 **TOMMOROW**
-Replicate all modifications of general_verif() in rest of the functions
 Write retract_move(),it should retrace game till start (Maybe we can use retract in many verif() functions)
-Add promotion feature
-Add checkmate feature
 double check and its consquences
 Maybe source finder individual validations needed in other functions too??
 */
@@ -286,14 +283,14 @@ void init_cmet(){
 int input(void);
 void piece_parser(char*);
 void pawn_parser(char*);
-struct piece* source_finder(int,int,enum type,int(*)[2],int,int,int); 
+struct piece* source_finder(int,int,enum piece_type,int(*)[2],int,int,int); 
 void make_move(struct piece*, struct square*);
 char convert(enum piece_type);
 void output(struct square [8][8]);
-bool check_verif(int,int,enum type,int(*)[2],int);
+bool check_verif(int,int,enum piece_type,int(*)[2],int);
 bool checkmate_verif(int,int,int(*)[2],int);
 bool discovered_check_verif(int,int,int,int);
-bool postfix_verif(int,int,enum type,int(*)[2],int);
+bool postfix_verif(int,int,enum piece_type,int(*)[2],int);
 bool general_verif(void); 
 
 static struct piece *prev_move_piece = NULL;
@@ -459,7 +456,7 @@ int input(){
     int rank = cmet.dst_rank;
     int src_file = cmet.src_file;
     int src_rank = cmet.src_rank;
-    enum type move_piece = cmet.type;
+    enum piece_type move_piece = cmet.type;
 
     int (*piece_arr)[2];
     int piece_arr_size;
@@ -493,10 +490,10 @@ int input(){
             piece_arr_size = 4;
             break;
         default:
-            return NULL;
+            return 0;
     }
     if((piece_ptr = source_finder(file,rank,move_piece,piece_arr,piece_arr_size,src_file,src_rank)) == NULL||
-            (postfix_verif(file,rank,piece_arr,piece_arr_size) == false)||(general_verif() == false)){
+            (postfix_verif(file,rank,move_piece,piece_arr,piece_arr_size) == false)||(general_verif() == false)){
         printf("Invalid move ,Please try again\n");
         return 1;
     }
@@ -510,7 +507,7 @@ int input(){
     return 0;
 }
 
-struct piece *source_finder(int file,int rank,enum move_piece,int (*piece_arr)[2],int piece_arr_size,int src_file,int src_rank){
+struct piece *source_finder(int file,int rank,enum piece_type move_piece,int (*piece_arr)[2],int piece_arr_size,int src_file,int src_rank){
 
     int inner_max_file,inner_max_rank,inner_min_file,inner_min_rank;
     int outer_max_file,outer_max_rank,outer_min_file,outer_min_rank;
@@ -588,7 +585,7 @@ struct piece *source_finder(int file,int rank,enum move_piece,int (*piece_arr)[2
     return NULL;
 }
 
-bool postfix_verif(int file,int rank,enum move_piece,int(*piece_arr)[2],int piece_arr_size){
+bool postfix_verif(int file,int rank,enum piece_type move_piece,int(*piece_arr)[2],int piece_arr_size){
 
     if(cmet.check_sym == true){
         if(check_verif(file,rank,move_piece,piece_arr,piece_arr_size)){
@@ -777,7 +774,7 @@ void output(struct square board[8][8]){
     printf("\n");
 }
 
-bool check_verif(int file,int rank,enum move_piece,int(*piece_arr)[2],int piece_arr_size){ 
+bool check_verif(int file,int rank,enum piece_type move_piece,int(*piece_arr)[2],int piece_arr_size){ 
 
     int og_dst_file = file;
     int og_dst_rank = rank;
@@ -843,7 +840,7 @@ bool check_verif(int file,int rank,enum move_piece,int(*piece_arr)[2],int piece_
 
 bool discovered_check_verif(int file,int rank,int king_file,int king_rank){
     
-    int king_file,king_rank;
+    int (*piece_arr)[2],piece_arr_size;
     enum piece_type discovered_piece;
     int inner_max_file,inner_max_rank,inner_min_file,inner_min_rank;
     int outer_max_file,outer_max_rank,outer_min_file,outer_min_rank;
