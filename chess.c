@@ -26,6 +26,7 @@
 //Checkmate patterns possible similar to checkin patterns
 //Promotion plus check/checkmate creates new patterns
 //Pieces should not be able to capture king
+//King should not be able to confront each other
 
 **TOMMOROW**
 Write retract_move(),it should retrace game till start (Maybe we can use retract in many verif() functions)
@@ -254,6 +255,15 @@ int black_pawn_arr[4][2]={
     {-1,-1}
 };
 
+struct move_node{
+    int og_file;
+    int og_rank;
+    int dst_file;
+    int dst_rank;
+    //struct move_node *prev;
+    struct move_node *next;
+};
+
 struct metrics{
     enum piece_type type;
     int dst_file;
@@ -292,6 +302,7 @@ bool checkmate_verif(int,int,int(*)[2],int);
 bool discovered_check_verif(int,int,int,int);
 bool postfix_verif(int,int,enum piece_type,int(*)[2],int);
 bool general_verif(void); 
+struct move_node* retract_move(struct move_node*);
 
 static struct piece *prev_move_piece = NULL;
 static struct square *prev_move_sqr = NULL;
@@ -427,6 +438,7 @@ int input(){
     char c,inp_arr[8];
     struct piece *piece_ptr;
     struct square *dst_sqr_ptr;
+    struct move_node *head = NULL;
 
     if(turn_flag == 1)
         printf("Enter move as white -\n");
@@ -451,7 +463,10 @@ int input(){
     else if(islower(inp_arr[0])){
         pawn_parser(inp_arr);
     }
-    
+    //else if(inp_arr[0] == '^' && inp_arr[1] == 'R'){
+    //    retract_move(head);   
+    //}    
+
     int file = cmet.dst_file;
     int rank = cmet.dst_rank;
     int src_file = cmet.src_file;
@@ -567,8 +582,18 @@ struct piece *source_finder(int file,int rank,enum piece_type move_piece,int (*p
                 if(cb[rank][file].p->color == turn_flag && cb[rank][file].p->type == move_piece){
                     if((cmet.src_file != -1 && cmet.src_rank != -1 && cmet.src_file == file && cmet.src_rank == rank)||
                             (cmet.src_file != -1 && cmet.src_file == file)||(cmet.src_rank != -1 && cmet.src_rank == rank)||
-                            (cmet.src_file == -1 && cmet.src_rank == -1))
+                            (cmet.src_file == -1 && cmet.src_rank == -1)){
+                        
+                        //struct move_node current = *head;
+                        //current = (struct move_node *)malloc(sizeof(struct move_node));                    
+                        //current->og_file = file;
+                        //current->og_rank = rank;
+                        //current->dst_file = og_dst_file;
+                        //current->dst_rank = og_dst_rank;
+                        //current->next = NULL;
+                        
                         return cb[rank][file].p;
+                    }
                     else
                         return NULL;
                 }
@@ -612,7 +637,6 @@ bool postfix_verif(int file,int rank,enum piece_type move_piece,int(*piece_arr)[
 
 bool general_verif(void){
     //1)King should not be in check after your move has been played
-    //
 
     int file,rank,king_file,king_rank;
     int inner_max_file,inner_max_rank,inner_min_file,inner_min_rank;
@@ -620,7 +644,7 @@ bool general_verif(void){
     enum piece_type defend_piece;
     int (*piece_arr)[2],piece_arr_size;
 
-    int (*piece_array_list[6])[2]={king_arr,queen_arr,rook_arr,bishop_arr,knight_arr};
+    int (*piece_array_list[4])[2]={queen_arr,rook_arr,bishop_arr,knight_arr};
 
     for(rank=0;rank<8;rank++){
         for(file=0;file<8;file++){
@@ -633,9 +657,9 @@ bool general_verif(void){
     }
     
     if(turn_flag == 1)
-        piece_array_list[5]=black_pawn_arr;
+        piece_array_list[4]=black_pawn_arr;
     else
-        piece_array_list[5]=white_pawn_arr;
+        piece_array_list[4]=white_pawn_arr;
 
     for(int i=0;i<6;i++){
         
@@ -644,21 +668,18 @@ bool general_verif(void){
         
         switch(i){
             case 0:
-                defend_piece = K;
-                break;
-            case 1:
                 defend_piece = Q;
                 break;
-            case 2:
+            case 1:
                 defend_piece = R;
                 break;
-            case 3:
+            case 2:
                 defend_piece = B;
                 break;
-            case 4:
+            case 3:
                 defend_piece = N;
                 break;
-            case 5:
+            case 4:
                 defend_piece = P;
                 break;
         }        
@@ -668,14 +689,12 @@ bool general_verif(void){
             file = king_file;
             rank = king_rank;
 
-            if(defend_piece == K || defend_piece == N || defend_piece == P){
-                if(defend_piece == P && j<2){
+            if(defend_piece == N || defend_piece == P){                   
+                if(defend_piece == P && j<2)
                     continue;
-                }
                 
                 file+= piece_arr[j][0];
                 rank+= piece_arr[j][1];
-                
                 inner_max_file = file+1; 
                 inner_max_rank = rank+1;
                 inner_min_file = file-1;
@@ -786,7 +805,7 @@ bool check_verif(int file,int rank,enum piece_type move_piece,int(*piece_arr)[2]
         file = og_dst_file;
         rank = og_dst_rank;
 
-        if(move_piece == K || move_piece == N || move_piece == P){
+        if(move_piece == N || move_piece == P){
             if(move_piece == P){
                 if(cmet.capture_sym == false && ((rank == 4 && turn_flag == 1)||(rank == 3 && turn_flag == -1)))
                     piece_arr_size = 2;                    
@@ -820,7 +839,7 @@ bool check_verif(int file,int rank,enum piece_type move_piece,int(*piece_arr)[2]
         for(;file<inner_max_file && file<outer_max_file && rank<inner_max_rank && rank<outer_max_rank && 
                 file>inner_min_file && file>outer_min_file && rank>inner_min_rank && rank>outer_min_rank
                 ;file += piece_arr[i][0], rank+=piece_arr[i][1]){
-            if(cb[rank][file].p != NULL){
+            if(cb[rank][file].p != NULL && (file != og_dst_file || rank != og_dst_rank)){
                 if(cb[rank][file].p->color != turn_flag && cb[rank][file].p->type == K){
                     if(discovered_check_verif(og_dst_file,og_dst_rank,file,rank))
                         double_check = true;
@@ -848,9 +867,9 @@ bool discovered_check_verif(int file,int rank,int king_file,int king_rank){
     int ghost_file = file;
     int ghost_rank = rank;
 
-    int(*piece_array_list[5])[2]={king_arr,queen_arr,rook_arr,bishop_arr,knight_arr};
+    int(*piece_array_list[4])[2]={queen_arr,rook_arr,bishop_arr,knight_arr};
 
-    for(int i=0;i<5;i++){
+    for(int i=0;i<4;i++){
         file = king_file;
         rank = king_rank;
         piece_arr = *(piece_array_list+i);
@@ -858,24 +877,21 @@ bool discovered_check_verif(int file,int rank,int king_file,int king_rank){
 
         switch(i){
             case 0:
-                discovered_piece = K;
-                break;
-            case 1:
                 discovered_piece = Q;
                 break;
-            case 2:
+            case 1:
                 discovered_piece = R;
                 break;
-            case 3:
+            case 2:
                 discovered_piece = B;
                 break;
-            case 4:
+            case 3:
                 discovered_piece = N;
                 break;
         }        
             
-        for(int j=0;j<piece_arr_size;i++){
-            if(discovered_piece == K || discovered_piece == N){
+        for(int j=0;j<piece_arr_size;j++){
+            if(discovered_piece == N){
                 file+= piece_arr[j][0];
                 rank+= piece_arr[j][1];
                 inner_max_file = file+1; 
@@ -894,7 +910,7 @@ bool discovered_check_verif(int file,int rank,int king_file,int king_rank){
             for(;file<inner_max_file && file<outer_max_file && rank<inner_max_rank && rank<outer_max_rank && 
                     file>inner_min_file && file>outer_min_file && rank>inner_min_rank && rank>outer_min_rank
                     ;file += piece_arr[j][0], rank+=piece_arr[j][1]){
-                if(cb[rank][file].p != NULL){
+                if(cb[rank][file].p != NULL && (file != king_file || rank != king_rank)){
                     if(cb[rank][file].p->color != turn_flag && cb[rank][file].p->type == discovered_piece && file != ghost_file && rank != ghost_rank)
                         return true;
                     else if(rank == ghost_rank && file == ghost_file)
@@ -907,6 +923,21 @@ bool discovered_check_verif(int file,int rank,int king_file,int king_rank){
     }
     return false;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*
 bool checkmate_verif(){
@@ -985,4 +1016,24 @@ bool checkmate_verif(){
    return false;
 }
 */
+/*
+ 
+struct move_node* retract_move(struct move_node* head){
 
+    struct move_node current = head;
+
+    //if(current->prev == NULL){
+    //    printf("At the beggining of the game , cant go further back\n")
+    //    return NULL;
+    //}
+
+    while(current->next != NULL){
+        current = next;
+    }
+
+    make_move(current->piece,current->og_file,current->og_rank);
+    current->next = NULL;
+    
+    return head;
+}
+*/
