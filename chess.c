@@ -28,10 +28,8 @@
 //Pieces should not be able to capture king
 //King should not be able to confront each other
 
-**TOMMOROW**
 Write retract_move(),it should retrace game till start (Maybe we can use retract in many verif() functions)
 double check and its consquences
-Maybe source finder individual validations needed in other functions too??
 */
 
 #include<stdio.h>
@@ -661,7 +659,7 @@ bool general_verif(void){
     else
         piece_array_list[4]=white_pawn_arr;
 
-    for(int i=0;i<6;i++){
+    for(int i=0;i<5;i++){
         
         piece_arr = *(piece_array_list + i);
         piece_arr_size = sizeof(piece_arr)/sizeof(piece_arr[0]);
