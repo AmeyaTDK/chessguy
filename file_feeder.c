@@ -1,7 +1,3 @@
-
- 
-/*
-////////////////////
 //Declerations - 
 //void input_packager(FILE *);
 //void packet_reader();
@@ -9,92 +5,93 @@
 
 //Main statemnets -
 
-init();    
-if(argc == 2){
-//FILE *fp = fopen(argv[1], "r");                
-//input_packager(fp);
-//packet_reader();
-//fclose(fp);    
-}
-else{
-while(1){
-init_cmet();
-if(input()){
-continue;
-}
-output(cb);
-if(turn_flag == 1)
-turn_flag = 0;
-else
-turn_flag = 1;
-}	
-}
-///////////////////////
+    init();    
+    if(argc == 2){
+        //FILE *fp = fopen(argv[1], "r");                
+        //input_packager(fp);
+        //packet_reader();
+        //fclose(fp);    
+    }
+    else{
+        while(1){
+            init_cmet();
+            if(input()){
+                continue;
+            }
+            output(cb);
+            if(turn_flag == 1)
+                turn_flag = 0;
+            else
+                turn_flag = 1;
+        }	
+    }
+
 ///code -  
+
 void input_packager(FILE *fp){
 
-int i,j,move_counter=0,empty_line=0,char_counter=0,space_counter,move_char=0;
-char input,line_buff[2],move_buff[2],dst_arr[8];
-struct move *head = NULL;
+    int i,j,move_counter=0,empty_line=0,char_counter=0,space_counter,move_char=0;
+    char input,line_buff[2],move_buff[2],dst_arr[8];
+    struct move *head = NULL;
 
-if(fp == NULL){
-printf("Error in opening the file\n");
-}
+    if(fp == NULL){
+        printf("Error in opening the file\n");
+    }
 
-while((input=fgetc(fp)) != EOF){
+    while((input=fgetc(fp)) != EOF){
 
-line_buff[0]=line_buff[1];
-line_buff[1]=input;
+        line_buff[0]=line_buff[1];
+        line_buff[1]=input;
 
-if(empty_line == 0 && line_buff[0] == line_buff[1] && line_buff[1] == '\n'){    //Ignores tags
-empty_line = 1;
-continue;
-}
+        if(empty_line == 0 && line_buff[0] == line_buff[1] && line_buff[1] == '\n'){    //Ignores tags
+            empty_line = 1;
+            continue;
+        }
 
-else if(empty_line == 1){   
-if(input == '.'){
-space_counter=0;
-move_counter++;
-continue;
-} 
-if(input == ' ' || input == '\n'){
-space_counter++;
-dst_arr[move_char] = '\0';
-if(space_counter == 2 || space_counter == 3){ 
-//for(int i=0; dst_arr[i] != '\0';i++){
-//    printf("%c",dst_arr[i]);
-//}
-//printf(" ");
-head = move_list(dst_arr,head,turn_flag,move_counter);
-}
-move_char=0;
-continue;
-}
-if(space_counter == 1){
-turn_flag = 1;
-dst_arr[move_char]=input;
-move_char++;
-continue;
-}
-if(space_counter == 2){
-    //head = move_list(dst_arr,head,turn_flag,move_counter);
-    turn_flag = 0; 
-    dst_arr[move_char]=input;
-    move_char++;
-    continue;
-}
-if(space_counter == 3){
-    //head = move_list(dst_arr,head,turn_flag,move_counter);
-    continue;
-}
-else
-;
-}   
-}
+        else if(empty_line == 1){   
+            if(input == '.'){
+                space_counter=0;
+                move_counter++;
+                continue;
+            } 
+            if(input == ' ' || input == '\n'){
+                space_counter++;
+                dst_arr[move_char] = '\0';
+                if(space_counter == 2 || space_counter == 3){ 
+                    //for(int i=0; dst_arr[i] != '\0';i++){
+                    //    printf("%c",dst_arr[i]);
+                    //}
+                    //printf(" ");
+                    head = move_list(dst_arr,head,turn_flag,move_counter);
+                }
+                move_char=0;
+                continue;
+            }
+            if(space_counter == 1){
+                turn_flag = 1;
+                dst_arr[move_char]=input;
+                move_char++;
+                continue;
+            }
+            if(space_counter == 2){
+                //head = move_list(dst_arr,head,turn_flag,move_counter);
+                turn_flag = 0; 
+                dst_arr[move_char]=input;
+                move_char++;
+                continue;
+            }
+            if(space_counter == 3){
+                //head = move_list(dst_arr,head,turn_flag,move_counter);
+                continue;
+            }
+            else
+                ;
+        }   
+    }
 
-//while(start->next != NULL){
-//    printf("")
-//}
+    //while(start->next != NULL){
+    //    printf("")
+    //}
 
 }
 
@@ -194,8 +191,6 @@ struct move *move_list(char *dst_arr, struct move *head, int turn_flag, int move
 }
 
 
-
-
 if(input == '.'){
     //move_counter++;
     space_counter=char_counter=0;
@@ -213,12 +208,12 @@ if(space_counter == 3){
     for(i=char_counter)
 }
 
-   struct move{
-       int move_no;
-       int turn_flag;
-       struct piece *p;
-       struct square *dst;
-       struct move *next;
-   };
+struct move{
+    int move_no;
+    int turn_flag;
+    struct piece *p;
+    struct square *dst;
+    struct move *next;
+};
 
-*/
+
