@@ -237,39 +237,18 @@ int knight_arr[8][2]={
     {2,-1},
     {-2,1},
     {-2,-1}
-};
-
-int white_pawn_arr[4][2]={
-    {0,1},
-    {0,2},
-    {1,1},
-    {-1,1}
-};
-
-int black_pawn_arr[4][2]={
-    {0,-1},
-    {0,-2},
-    {1,-1},
-    {-1,-1}
-};
-
-struct move_data{
-    int move_no;
-    char string1[7];
-    char string2[7];
-    struct move_data *next;
-};
+}
 
 struct move_node{
-    int src_file;
-    int src_rank;
+    int og_file;
+    int og_rank;
     int dst_file;
     int dst_rank;
     struct piece *captured_piece;
     bool promo_move;
     struct move_node *prev;
     struct move_node *next;
-};
+}chess_move_data;
 
 struct metrics{
     enum piece_type type;
@@ -297,10 +276,11 @@ void init_cmet(){
     cmet.promo_piece = -1;
 }
 
+
 int input(struct move_data *);
 void piece_parser(char*);
 void pawn_parser(char*);
-struct piece *source_finder(int,int,enum piece_type,int(*)[2],int,int *,int *,int(*)[3],bool); 
+bool source_finder(int,int,enum piece_type,int(*)[2],int *,int *,int(*)[3],bool); 
 bool postfix_verify(int,int,enum piece_type,int(*)[2],int);
 bool general_verify(bool);
 bool check_verify(int,int,enum piece_type,int(*)[2],int,int(*)[3]);
@@ -312,9 +292,8 @@ void make_move(struct piece*, struct square*);
 char convert(enum piece_type);
 void output(struct square [8][8]);
 void move_packager(FILE *);
-struct move_data *create_file_node(void);
+struct move_data *create_node();
 
-bool king_flag = true;
 struct move_data *file_head = NULL;
 struct move_data *file_current = NULL;
 struct move_node *head = NULL;
@@ -626,49 +605,41 @@ struct piece *source_finder(int dst_file,int dst_rank,enum piece_type move_piece
                     return false;
                 }
 
-
-                if(cb[dst_rank][dst_file].p == NULL){
-                    if(cmet.capture_sym){
-                        printf("Invalid move,\n");
-                        return false;
-                    }
-                    else{
-                        if((((dst_rank == 4 && turn_flag == 1)||(dst_rank == 3 && turn_flag == -1)) && sub_array > 1)||
-                                (((dst_rank != 4 && turn_flag == 1)||(dst_rank != 3 && turn_flag == -1)) && sub_array > 0)){
-                            printf("Invalid move,\n");
-                            return false;
-                        }
-                    }
+                if(cmet.capture_sym && sub_array < 2){
+                    continue;
                 }
-                else{
-                    if(cb[dst_rank][dst_file].p->type != K){
-                        if(cmet.capture_sym){
-                            if(sub_array < 2)
-                                continue;
-                            //else{
-                            //    printf("Invalid move,\n");
-                            //    return false;
-                            //}
+                else if(!cmet.capture_sym){
+                    if(cb[dst_rank][dst_file].p == NULL)
+                        ;
+                    else{ 
+                        if(cb[dst_rank][dst_file].p->type != K){
+                            printf("Invalid move,PAWN is blocked\n");
+                            return false;
                         }
                         else{
-                            printf("Invalid move,\n");
-                            return false;
+                            if(sub_array < 2)
+                                continue;
                         }
                     }
-                    else{
-                        if(sub_array < 2)
-                            continue;
+
+                    if(((dst_rank == 4 && turn_flag == 1)||(dst_rank == 3 && turn_flag == -1)) && sub_array > 1 && cb[dst_rank][dst_file].p->type != K){
+                        printf("PAWN could not be found\n");
+                        break;        
+                    }
+                    else if(((dst_rank != 4 && turn_flag == 1)||(dst_rank != 3 && turn_flag == -1)) && sub_array > 0 && cb[dst_rank][dst_file].p->type != K){
+                        printf("PAWN could not be found\n");
+                        break;
                     }
                 }
             }
-                dst_file+= piece_arr[sub_array][0];
-                dst_rank+= piece_arr[sub_array][1];
-                inner_max_file = dst_file+1; 
-                inner_max_rank = dst_rank+1;
-                inner_min_file = dst_file-1;
-                inner_min_rank = dst_rank-1;
-        }
 
+            dst_file+= piece_arr[sub_array][0];
+            dst_rank+= piece_arr[sub_array][1];
+            inner_max_file = dst_file+1; 
+            inner_max_rank = dst_rank+1;
+            inner_min_file = dst_file-1;
+            inner_min_rank = dst_rank-1;
+        }
         else{
             inner_max_file = inner_max_rank = 8;
             inner_min_file = inner_min_rank = -1;
@@ -707,6 +678,7 @@ struct piece *source_finder(int dst_file,int dst_rank,enum piece_type move_piece
     }
     return NULL;
 }
+
 
 bool general_verify(bool king_flag){ 
 
@@ -762,7 +734,7 @@ bool general_verify(bool king_flag){
     }
     if(check_state && !cmet.check_sym)
         check_state = false;
-
+    
     return true;
 }
 
@@ -1273,75 +1245,45 @@ void output(struct square board[8][8]){
         }         
     }
     printf("\n");
+
 }
 
-    /*
-     ***TREE***
+/*
+ ***TREE***
 
-     promo           capture             non capture
-     4               1            piece exist   dst_rank(3/4)   dst_rank(else)     
+ promo           capture             non capture
+ 4               1            piece exist   dst_rank(3/4)   dst_rank(else)     
 
-     5               3               2
+ 5               3               2
 
-     1 === Run sub_array 2,3
-     1'=== No piece exist to capture
+ 1 === Run sub_array 2,3
+ 1'=== No piece exist to capture
 
-     2 === Run sub_array 0
-     2'=== Pawn could not be found
+ 2 === Run sub_array 0
+ 2'=== Pawn could not be found
 
-     3 === Run sub_array 0,1 in that order
-     3'=== Pawn could not be found
+ 3 === Run sub_array 0,1 in that order
+ 3'=== Pawn could not be found
 
-     4 === dst rank must be final rank
-     4'=== Pawn can only promote on final rank
+ 4 === dst rank must be final rank
+ 4'=== Pawn can only promote on final rank
 
-     5 === dst_sqr should not have ANY piece
-     5'=== Pawn is blocked
+ 5 === dst_sqr should not have ANY piece
+ 5'=== Pawn is blocked
 
 */
-    /*
-       while(file_current->next != NULL){
-       for(int i=0;file_current->string1[i] != '\0';i++)
-       printf("%c",file_current->string1[i]);
-       printf("\t");
-       for(int i=0;file_current->string2[i] != '\0';i++)
-       printf("%c",file_current->string2[i]);
-       printf("\n");
-       file_current = file_current->next;
-       }
-       return 1;
-       */
-    /*
-     *
-     if(cmet.capture_sym && sub_array < 2){
-     continue;
-     }
-     else if(!cmet.capture_sym){
-     if(cb[dst_rank][dst_file].p == NULL){
-     if((((dst_rank == 4 && turn_flag == 1)||(dst_rank == 3 && turn_flag == -1)) && sub_array > 1)||
-     ((dst_rank != 4 && turn_flag == 1)||(dst_rank != 3 && turn_flag == -1)) && sub_array > 0){
-     printf("PAWN could not be found\n");
-     break;        
-     }
-     }
-     else{ 
-     if(cb[dst_rank][dst_file].p->type != K){
-     printf("Invalid move,PAWN is blocked\n");
-     return false;
-     }
-     else{
-     if(sub_array < 2)
-     continue;
-     }
-     }
-
-     if((((dst_rank == 4 && turn_flag == 1)||(dst_rank == 3 && turn_flag == -1)) && sub_array > 1 && cb[dst_rank][dst_file].p->type != K)||
-     ((dst_rank != 4 && turn_flag == 1)||(dst_rank != 3 && turn_flag == -1)) && sub_array > 0 && cb[dst_rank][dst_file].p->type != K){
-     printf("PAWN could not be found\n");
-     break;        
-     }
-     }
-     }
-     *
-     */
+/*
+   while(file_current->next != NULL){
+   for(int i=0;file_current->string1[i] != '\0';i++)
+   printf("%c",file_current->string1[i]);
+   printf("\t");
+   for(int i=0;file_current->string2[i] != '\0';i++)
+   printf("%c",file_current->string2[i]);
+   printf("\n");
+   file_current = file_current->next;
+   }
+   return 1;
+   */
+/*
+ */
 
