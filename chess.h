@@ -8,24 +8,28 @@
 
 #define MAX_MOVE_LEN 7
 
-enum piece_type{
+enum piece_type {
     K,Q,R,B,N,P
 };
 
-struct piece{
+struct piece {
     int color;
     struct square *sqr;
     enum piece_type type;
 };
 
-struct square{
+struct square {
     bool present;
     struct piece *p;
 	int x;
 	int y;
 };
 
-typedef struct square chessboard[8][8];
+struct chessboard {
+	struct square[8][8];
+	int turn;
+	// state variables
+};
 
 enum outcome {
 	COMPLETE,
@@ -48,7 +52,7 @@ enum outcome {
  * [out] paths: list of possible paths
  *
  */
-int find_paths(chessboard* cb, int x, int y, piece_type type, int color, struct square** paths);
+int find_paths(chessboard* cb, int x, int y, piece_type type, int color, struct square*** paths);
 
 /*
  * This func initiates the chessboard to standard starting position.

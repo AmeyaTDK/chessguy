@@ -282,6 +282,7 @@ bool checkmate_state = false;
 int turn_flag = 1;
 bool program_stop = false;
 
+/*
 int main(int argc, char *argv[]){
 
     //printf("\033[2J\033[H");
@@ -322,7 +323,7 @@ int main(int argc, char *argv[]){
         turn_flag *= -1;
     }
 
-}
+}*/
 
 void move_packager(FILE *fp){
 
