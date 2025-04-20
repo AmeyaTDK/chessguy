@@ -39,51 +39,7 @@
 #include<string.h>
 #include<unistd.h>
 
-enum piece_type{
-    K,Q,R,B,N,P
-}type;
-
-struct piece{
-    int color;
-    struct square *sqr;
-    enum piece_type type;
-} BR1={-1,NULL,R}, 
-    BN1={-1,NULL,N},
-    BB1={-1,NULL,B},
-    BQ={-1,NULL,Q},
-    BK={-1,NULL,K},
-    BB2={-1,NULL,B},
-    BN2={-1,NULL,N},
-    BR2={-1,NULL,R},
-    BP1={-1,NULL,P},
-    BP2={-1,NULL,P},
-    BP3={-1,NULL,P},
-    BP4={-1,NULL,P},
-    BP5={-1,NULL,P}, 
-    BP6={-1,NULL,P},
-    BP7={-1,NULL,P}, 
-    BP8={-1,NULL,P},
-    WP1={1,NULL,P},
-    WP2={1,NULL,P},
-    WP3={1,NULL,P},
-    WP4={1,NULL,P},
-    WP5={1,NULL,P},
-    WP6={1,NULL,P},
-    WP7={1,NULL,P},
-    WP8={1,NULL,P},
-    WR1={1,NULL,R},
-    WN1={1,NULL,N},
-    WB1={1,NULL,B},
-    WQ={1,NULL,Q},
-    WK={1,NULL,K},
-    WB2={1,NULL,B},
-    WN2={1,NULL,N},
-    WR2={1,NULL,R}; 
-
-struct square{
-    bool present;
-    struct piece *p;
-}cb[8][8];
+#include "chess.h"
 
 void square_init(){
 
