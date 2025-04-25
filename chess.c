@@ -41,108 +41,222 @@
 
 #include "chess.h"
 
+enum piece_type{
+    K,Q,R,B,N,P
+}type;
+
+struct piece{
+    int color;
+    struct square *sqr;
+    enum piece_type type;
+} BR1={-1,NULL,R}, 
+    BN1={-1,NULL,N},
+    BB1={-1,NULL,B},
+    BQ={-1,NULL,Q},
+    BK={-1,NULL,K},
+    BB2={-1,NULL,B},
+    BN2={-1,NULL,N},
+    BR2={-1,NULL,R},
+    BP1={-1,NULL,P},
+    BP2={-1,NULL,P},
+    BP3={-1,NULL,P},
+    BP4={-1,NULL,P},
+    BP5={-1,NULL,P}, 
+    BP6={-1,NULL,P},
+    BP7={-1,NULL,P}, 
+    BP8={-1,NULL,P},
+    WP1={1,NULL,P},
+    WP2={1,NULL,P},
+    WP3={1,NULL,P},
+    WP4={1,NULL,P},
+    WP5={1,NULL,P},
+    WP6={1,NULL,P},
+    WP7={1,NULL,P},
+    WP8={1,NULL,P},
+    WR1={1,NULL,R},
+    WN1={1,NULL,N},
+    WB1={1,NULL,B},
+    WQ={1,NULL,Q},
+    WK={1,NULL,K},
+    WB2={1,NULL,B},
+    WN2={1,NULL,N},
+    WR2={1,NULL,R}; 
+
+struct square{
+    int file;
+    int rank;
+    bool present;
+    struct piece *p;
+}cb[8][8];
+
 void square_init(){
 
     for(int rank=2;rank<6;rank++){
         for(int file=0;file<8;file++){
-            cb[rank][file].present=0;
+            cb[rank][file].file = file;
+            cb[rank][file].rank = rank;
+            cb[rank][file].present = 0;
             cb[rank][file].p = NULL;
         }
     }
-
+    
+    cb[0][0].file = 0;
+    cb[0][0].rank = 0;
     cb[0][0].present=1;
     cb[0][0].p=&BR1;
     BR1.sqr =&cb[0][0];
+    cb[0][1].file = 1;
+    cb[0][1].rank = 0;
     cb[0][1].present=1;
     cb[0][1].p=&BN1;
     BN1.sqr =&cb[0][1];
+    cb[0][2].file = 2;
+    cb[0][2].rank = 0;
     cb[0][2].present=1;
     cb[0][2].p=&BB1;
     BB1.sqr =&cb[0][2];
+    cb[0][3].file = 3;
+    cb[0][3].rank = 0;
     cb[0][3].present=1;
     cb[0][3].p=&BQ;
     BQ.sqr =&cb[0][3];
+    cb[0][4].file = 4;
+    cb[0][4].rank = 0;
     cb[0][4].present=1;
     cb[0][4].p=&BK;
     BK.sqr =&cb[0][4];
+    cb[0][5].file = 5;
+    cb[0][5].rank = 0;
     cb[0][5].present=1;
     cb[0][5].p=&BB2;
     BB2.sqr =&cb[0][5];
+    cb[0][6].file = 6;
+    cb[0][6].rank = 0;
     cb[0][6].present=1;
     cb[0][6].p=&BN2;
     BN2.sqr =&cb[0][6];
+    cb[0][7].file = 7;
+    cb[0][7].rank = 0;
     cb[0][7].present=1;
     cb[0][7].p=&BR2;
     BR2.sqr =&cb[0][7];
+    cb[1][0].file = 0;
+    cb[1][0].rank = 1;
     cb[1][0].present=1;
     cb[1][0].p=&BP1;
     BP1.sqr =&cb[1][0];
+    cb[1][1].file = 1;
+    cb[1][1].rank = 1;
     cb[1][1].present=1;
     cb[1][1].p=&BP2;
     BP2.sqr =&cb[1][1];
+    cb[1][2].file = 2;
+    cb[1][2].rank = 1;
     cb[1][2].present=1;
     cb[1][2].p=&BP3;
     BP3.sqr =&cb[1][2];
+    cb[1][3].file = 3;
+    cb[1][3].rank = 1;
     cb[1][3].present=1;
     cb[1][3].p=&BP4;
     BP4.sqr =&cb[1][3];
+    cb[1][4].file = 4;
+    cb[1][4].rank = 1;
     cb[1][4].present=1;
     cb[1][4].p=&BP5;
     BP5.sqr =&cb[1][4];
+    cb[1][5].file = 5;
+    cb[1][5].rank = 1;
     cb[1][5].present=1;
     cb[1][5].p=&BP6;
     BP6.sqr =&cb[1][5];
+    cb[1][6].file = 6;
+    cb[1][6].rank = 1;
     cb[1][6].present=1;
     cb[1][6].p=&BP7;
     BP7.sqr =&cb[1][6];
+    cb[1][7].file = 7;
+    cb[1][7].rank = 1;
     cb[1][7].present=1;
     cb[1][7].p=&BP8;
     BP8.sqr =&cb[1][7];
+    cb[6][0].file = 0;
+    cb[6][0].rank = 6;
     cb[6][0].present=1;
     cb[6][0].p=&WP1;
     WP1.sqr =&cb[6][0];
+    cb[6][1].file = 1;
+    cb[6][1].rank = 6;
     cb[6][1].present=1;
     cb[6][1].p=&WP2;
     WP2.sqr =&cb[6][1];
+    cb[6][2].file = 2;
+    cb[6][2].rank = 6;
     cb[6][2].present=1;
     cb[6][2].p=&WP3;
     WP3.sqr =&cb[6][2];
+    cb[6][3].file = 3;
+    cb[6][3].rank = 6;
     cb[6][3].present=1;
     cb[6][3].p=&WP4;
     WP4.sqr =&cb[6][3];
+    cb[6][4].file = 4;
+    cb[6][4].rank = 6;
     cb[6][4].present=1;
     cb[6][4].p=&WP5;
     WP5.sqr =&cb[6][4];
+    cb[6][5].file = 5;
+    cb[6][5].rank = 6;
     cb[6][5].present=1;
     cb[6][5].p=&WP6;
     WP6.sqr =&cb[6][5];
+    cb[6][6].file = 6;
+    cb[6][6].rank = 6;
     cb[6][6].present=1;
     cb[6][6].p=&WP7;
     WP7.sqr =&cb[6][6];
+    cb[6][7].file = 7;
+    cb[6][7].rank = 6;
     cb[6][7].present=1;
     cb[6][7].p=&WP8;
     WP8.sqr =&cb[6][7];
+    cb[7][0].file = 0;
+    cb[7][0].rank = 7;
     cb[7][0].present=1;
     cb[7][0].p=&WR1;
     WR1.sqr =&cb[7][0];
+    cb[7][1].file = 1;
+    cb[7][1].rank = 7;
     cb[7][1].present=1;
     cb[7][1].p=&WN1;
     WN1.sqr =&cb[7][1];
+    cb[7][2].file = 2;
+    cb[7][2].rank = 7;
     cb[7][2].present=1;
     cb[7][2].p=&WB1;
     WB1.sqr =&cb[7][2];
+    cb[7][3].file = 3;
+    cb[7][3].rank = 7;
     cb[7][3].present=1;
     cb[7][3].p=&WQ;
     WQ.sqr =&cb[7][3];
+    cb[7][4].file = 4;
+    cb[7][4].rank = 7;
     cb[7][4].present=1;
     cb[7][4].p=&WK;
     WK.sqr =&cb[7][4];
+    cb[7][5].file = 5;
+    cb[7][5].rank = 7;
     cb[7][5].present=1;
     cb[7][5].p=&WB2;
     WB2.sqr =&cb[7][5];
+    cb[7][6].file = 6;
+    cb[7][6].rank = 7;
     cb[7][6].present=1;
     cb[7][6].p=&WN2;
     WN2.sqr =&cb[7][6];
+    cb[7][7].file = 7;
+    cb[7][7].rank = 7;
     cb[7][7].present=1;
     cb[7][7].p=&WR2;
     WR2.sqr =&cb[7][7];
@@ -256,7 +370,7 @@ void init_cmet(){
 int input(struct move_data *);
 void piece_parser(char*);
 void pawn_parser(char*);
-struct piece *source_finder(int,int,enum piece_type,int(*)[2],int,int *,int *,int(*)[3],bool); 
+struct piece *source_finder(int,int,enum piece_type,int(*)[2],int,int,int,int(*)[3],bool); 
 bool postfix_verify(int,int,enum piece_type,int(*)[2],int);
 bool general_verify(bool);
 bool check_verify(int,int,enum piece_type,int(*)[2],int,int(*)[3]);
@@ -266,7 +380,7 @@ void insert_newnode(int,int,int,int);
 void delete_newnode();
 void make_move(struct piece*, struct square*);
 char convert(enum piece_type);
-void output(struct square [8][8]);
+void output(struct square (*)[8]);
 void move_packager(FILE *);
 struct move_data *create_file_node(void);
 
@@ -298,16 +412,16 @@ int main(int argc, char *argv[]){
         init_cmet();
         int res = input(file_head);
         switch(res){
-            case 0://Normal exit
+            case 0:
                 break;
-            case 1://Invalid move exit
+            case 1:
                 printf("Invalid move,Please try again !\n");
                 continue;
-            case 2://Game finishing exit
+            case 2:
                 output(cb);
                 printf("Game is finished, Exiting normally\n");
                 return 0;
-            case 3://Game unfinished exit
+            case 3:
                 output(cb);
                 printf("Game is unfinished, Exiting normally\n");
                 return 0;
@@ -325,74 +439,6 @@ int main(int argc, char *argv[]){
 
 }*/
 
-void move_packager(FILE *fp){
-
-    if(fp == NULL){
-        printf("Error in opening the file\n");
-        return;
-    }
-
-    int move_counter=0,move_length_counter=0,space_counter=0,main_body_length=0;
-    char c,cache[2];
-    bool record = false;
-
-    while((c = fgetc(fp)) != EOF){
-
-        cache[0] = cache[1];
-        cache[1] = c;
-
-        if(cache[0] == '\n' && cache[1] == '\n')
-            break;
-    }
-
-    while((c = fgetc(fp)) != EOF){
-
-        if(c == '.'){
-            if(file_head == NULL){
-                file_head = create_file_node();
-                file_current = file_head;
-            }
-            else{
-                file_current->next = create_file_node();
-                file_current = file_current->next;        
-            }
-            move_counter++;
-            file_current->move_no = move_counter;
-            record = true;
-            space_counter = 0;
-            continue;
-        }
-        if(record){
-            if(c  == ' ' || c == '\n'){
-                space_counter++;
-                move_length_counter = 0;
-                continue;
-            }
-            if(space_counter == 1){
-                file_current->string1[move_length_counter] = c;
-                move_length_counter++;
-            }
-            if(space_counter == 2){
-                file_current->string2[move_length_counter] = c;
-                move_length_counter++;
-            }
-            else if(space_counter == 3)
-                record = false;
-        }
-        else
-            continue;
-    }
-    file_current = file_head;
-}
-
-struct move_data *create_file_node(){
-    struct move_data *newnode = (struct move_data *)calloc(1,sizeof(struct move_data));
-    if(newnode == NULL){
-        printf("Memory allocation during file input list creation failed\n");
-        return NULL;
-    }
-    return newnode;
-}
 
 int input(struct move_data *file_head){
 
@@ -408,10 +454,8 @@ int input(struct move_data *file_head){
 
         for(int i=0;i<8;i++){
             c=getchar();
-            if(c =='\n'){
-                inp_arr[i]='\0';
+            if(c =='\n')
                 break;
-            }
             else{
                 inp_arr[i]=c;
                 continue;
@@ -500,12 +544,14 @@ int input(struct move_data *file_head){
             piece_arr_size = 4;
     }
 
-    if(source_finder(dst_file,dst_rank,move_piece,piece_arr,piece_arr_size,&src_file,&src_rank,NULL,true) != NULL)
+    if((piece_ptr = source_finder(dst_file,dst_rank,move_piece,piece_arr,piece_arr_size,src_file,src_rank,NULL,true)) != NULL){
+        src_file = piece_ptr->sqr->file;
+        src_rank = piece_ptr->sqr->rank;
         insert_newnode(src_file,src_rank,dst_file,dst_rank);
+    }
     else
         return 1;
 
-    piece_ptr = cb[src_rank][src_file].p;
     dst_sqr_ptr = &cb[dst_rank][dst_file];
     make_move(piece_ptr,dst_sqr_ptr); 
 
@@ -559,7 +605,7 @@ int input(struct move_data *file_head){
     return 0;
 }
 
-struct piece *source_finder(int dst_file,int dst_rank,enum piece_type move_piece,int (*piece_arr)[2],int piece_arr_size,int *src_file,int *src_rank,int (*checking_piece_info)[3],bool king_flag){
+struct piece *source_finder(int dst_file,int dst_rank,enum piece_type move_piece,int (*piece_arr)[2],int piece_arr_size,int src_file,int src_rank,int (*checking_piece_info)[3],bool king_flag){
 
     int (*piece_array_list[6])[2] = {queen_arr,rook_arr,bishop_arr,knight_arr,NULL,king_arr};
     int inner_max_file,inner_max_rank,inner_min_file,inner_min_rank;
@@ -570,7 +616,7 @@ struct piece *source_finder(int dst_file,int dst_rank,enum piece_type move_piece
     if(cb[og_dst_rank][og_dst_file].p != NULL && cb[og_dst_rank][og_dst_file].p->color == turn_flag && cb[og_dst_rank][og_dst_file].p->type != K){
         printf("Invalid move,square occupied by own piece\n");                   
         return false;
-    } //King capture issues
+    }
 
     for(int sub_array=0; sub_array<piece_arr_size; sub_array++){ 
         dst_file = og_dst_file;
@@ -582,7 +628,6 @@ struct piece *source_finder(int dst_file,int dst_rank,enum piece_type move_piece
                     printf("Invalid move,PAWN can only promote on opposition's back rank\n");
                     return false;
                 }
-
 
                 if(cb[dst_rank][dst_file].p == NULL){
                     if(cmet.capture_sym){
@@ -602,10 +647,6 @@ struct piece *source_finder(int dst_file,int dst_rank,enum piece_type move_piece
                         if(cmet.capture_sym){
                             if(sub_array < 2)
                                 continue;
-                            //else{
-                            //    printf("Invalid move,\n");
-                            //    return false;
-                            //}
                         }
                         else{
                             printf("Invalid move,\n");
@@ -645,13 +686,8 @@ struct piece *source_finder(int dst_file,int dst_rank,enum piece_type move_piece
                         checking_piece_info[0][1] = dst_rank;
                         checking_piece_info[0][2] = sub_array;
                     }
-                    if(src_file != NULL && src_rank != NULL && ((*src_file != -1 && *src_rank != -1 && *src_file == dst_file && *src_rank == dst_rank)||(*src_file != -1 && *src_file == dst_file)||
-                                (*src_rank != -1 && *src_rank == dst_rank)||(*src_file == -1 && *src_rank == -1))){ 
-                        *src_file = dst_file;
-                        *src_rank = dst_rank;
-                        return cb[dst_rank][dst_file].p;
-                    }
-                    else if(src_file == NULL && src_rank == NULL){
+                    if((src_file != -1 && src_rank != -1 && src_file == dst_file && src_rank == dst_rank)||(src_file != -1 && src_file == dst_file)||
+                                (src_rank != -1 && src_rank == dst_rank)||(src_file == -1 && src_rank == -1)){ 
                         return cb[dst_rank][dst_file].p;
                     }
                 }
@@ -712,7 +748,7 @@ bool general_verify(bool king_flag){
                 move_piece = P;
                 break;
         }
-        if(source_finder(king_file,king_rank,move_piece,piece_arr,piece_arr_size,NULL,NULL,NULL,false) != NULL){
+        if(source_finder(king_file,king_rank,move_piece,piece_arr,piece_arr_size,-1,-1,NULL,false) != NULL){
             printf("Invalid move,KING is/would being/be threatened\n");
             return false;
         }
@@ -760,7 +796,7 @@ bool check_verify(int dst_file,int dst_rank,enum piece_type move_piece,int(*piec
         }
     }
 
-    if(source_finder(king_file,king_rank,move_piece,piece_arr,piece_arr_size,NULL,NULL,checking_piece_info,true) != NULL)
+    if(source_finder(king_file,king_rank,move_piece,piece_arr,piece_arr_size,-1,-1,checking_piece_info,true) != NULL)
         direct = true;
 
     if(checking_piece_info != NULL)
@@ -775,7 +811,7 @@ bool check_verify(int dst_file,int dst_rank,enum piece_type move_piece,int(*piec
                 move_piece = R;
             else
                 move_piece = Q;
-            if(source_finder(king_file,king_rank,move_piece,piece_arr,piece_arr_size,NULL,NULL,checking_piece_info,true) != NULL){
+            if(source_finder(king_file,king_rank,move_piece,piece_arr,piece_arr_size,-1,-1,checking_piece_info,true) != NULL){
                 discov = true;
                 break;
             }
@@ -791,7 +827,7 @@ bool check_verify(int dst_file,int dst_rank,enum piece_type move_piece,int(*piec
                 move_piece = B;
             else
                 move_piece = Q;
-            if(source_finder(king_file,king_rank,move_piece,piece_arr,piece_arr_size,NULL,NULL,checking_piece_info,true) != NULL){
+            if(source_finder(king_file,king_rank,move_piece,piece_arr,piece_arr_size,-1,-1,checking_piece_info,true) != NULL){
                 discov = true;
                 break;
             }
@@ -832,7 +868,7 @@ bool checkmate_verify(int dst_file,int dst_rank,enum piece_type move_piece,int(*
             }
             for(int i=0;i<8 && (safe_sqrs[0][i] != -1 || safe_sqrs[1][i] != -1);i++){
                 turn_flag *= -1;
-                if(source_finder(safe_sqrs[0][i],safe_sqrs[1][i],K,king_arr,8,NULL,NULL,NULL,false) != NULL){ //Confirm for correct king
+                if(source_finder(safe_sqrs[0][i],safe_sqrs[1][i],K,king_arr,8,-1,-1,NULL,false) != NULL){ //Confirm for correct king
                     make_move(cb[king_rank][king_file].p,&cb[safe_sqrs[1][i]][safe_sqrs[0][i]]);
                     insert_newnode(safe_sqrs[0][i],safe_sqrs[1][i],king_file,king_rank);
                     if(!general_verify(false)){
@@ -855,7 +891,7 @@ bool checkmate_verify(int dst_file,int dst_rank,enum piece_type move_piece,int(*
             else
                 checking_piece_info_ptr = checking_piece_info + 1;
 
-            switch(cb[checking_piece_info_ptr[0][1]][checking_piece_info_ptr[0][0]].p->type){ //problem here
+            switch(cb[checking_piece_info_ptr[0][1]][checking_piece_info_ptr[0][0]].p->type){
                 case Q:
                     piece_arr = (queen_arr + checking_piece_info_ptr[0][2]);
                     break;
@@ -914,7 +950,7 @@ bool checkmate_verify(int dst_file,int dst_rank,enum piece_type move_piece,int(*
                             move_piece = P;
                             break;
                     }
-                    if(source_finder(path_sqrs[0][i],path_sqrs[1][i],move_piece,piece_arr,piece_arr_size,NULL,NULL,NULL,false) != NULL){ //piece that can move should be opposite sides
+                    if(source_finder(path_sqrs[0][i],path_sqrs[1][i],move_piece,piece_arr,piece_arr_size,-1,-1,NULL,false) != NULL){ //piece that can move should be opposite sides
                         make_move(blocking_piece,&cb[checking_piece_info_ptr[0][1]][checking_piece_info_ptr[0][0]]); //make the oppositions temp blocking move !?
                         general_verify(false);
                         return false;
@@ -929,7 +965,7 @@ bool checkmate_verify(int dst_file,int dst_rank,enum piece_type move_piece,int(*
                 }
             }
             for(int i=0;i<8 && (safe_sqrs[0][i] != -1 || safe_sqrs[1][i] != -1);i++){
-                if(source_finder(safe_sqrs[0][i],safe_sqrs[1][i],K,king_arr,8,NULL,NULL,NULL,false) != NULL){
+                if(source_finder(safe_sqrs[0][i],safe_sqrs[1][i],K,king_arr,8,-1,1,NULL,false) != NULL){
                     make_move(cb[king_rank][king_file].p,&cb[safe_sqrs[1][i]][safe_sqrs[0][i]]);
                     insert_newnode(safe_sqrs[0][i],safe_sqrs[1][i],king_file,king_rank);
                     if(!general_verify(false)){
@@ -1025,6 +1061,75 @@ void delete_newnode(){
     prevnode_addr = current->prev;
     current->prev = NULL;
     current = prevnode_addr;
+}
+
+void move_packager(FILE *fp){
+
+    if(fp == NULL){
+        printf("Error in opening the file\n");
+        return;
+    }
+
+    int move_counter=0,move_length_counter=0,space_counter=0,main_body_length=0;
+    char c,cache[2];
+    bool record = false;
+
+    while((c = fgetc(fp)) != EOF){
+
+        cache[0] = cache[1];
+        cache[1] = c;
+
+        if(cache[0] == '\n' && cache[1] == '\n')
+            break;
+    }
+
+    while((c = fgetc(fp)) != EOF){
+
+        if(c == '.'){
+            if(file_head == NULL){
+                file_head = create_file_node();
+                file_current = file_head;
+            }
+            else{
+                file_current->next = create_file_node();
+                file_current = file_current->next;        
+            }
+            move_counter++;
+            file_current->move_no = move_counter;
+            record = true;
+            space_counter = 0;
+            continue;
+        }
+        if(record){
+            if(c  == ' ' || c == '\n'){
+                space_counter++;
+                move_length_counter = 0;
+                continue;
+            }
+            if(space_counter == 1){
+                file_current->string1[move_length_counter] = c;
+                move_length_counter++;
+            }
+            if(space_counter == 2){
+                file_current->string2[move_length_counter] = c;
+                move_length_counter++;
+            }
+            else if(space_counter == 3)
+                record = false;
+        }
+        else
+            continue;
+    }
+    file_current = file_head;
+}
+
+struct move_data *create_file_node(){
+    struct move_data *newnode = (struct move_data *)calloc(1,sizeof(struct move_data));
+    if(newnode == NULL){
+        printf("Memory allocation during file input list creation failed\n");
+        return NULL;
+    }
+    return newnode;
 }
 
 void piece_parser(char *inp_arr){
@@ -1183,7 +1288,7 @@ char convert(enum piece_type type){
     }
 }
 
-void output(struct square board[8][8]){
+void output(struct square (*cb)[8]){
 
     int i,j;  
     char c;
@@ -1202,7 +1307,6 @@ void output(struct square board[8][8]){
         printf("\n");
     }
 
-
     for(i=0;i<9;i++){		
         if(i==8){
             for(j=0;j<9;j++){
@@ -1217,11 +1321,11 @@ void output(struct square board[8][8]){
         else{
             printf(" %d  ",(8-i));
             for(j=0;j<8;j++){
-                if(board[i][j].present){
-                    if(board[i][j].p->color == -1)
-                        printf("B%c ",convert(board[i][j].p->type));
-                    else if(board[i][j].p->color == 1)
-                        printf("W%c ",convert(board[i][j].p->type));
+                if(cb[i][j].present){
+                    if(cb[i][j].p->color == -1)
+                        printf("B%c ",convert(cb[i][j].p->type));
+                    else if(cb[i][j].p->color == 1)
+                        printf("W%c ",convert(cb[i][j].p->type));
                 }
                 else 
                     printf("*  ");
@@ -1232,73 +1336,4 @@ void output(struct square board[8][8]){
     printf("\n");
 }
 
-    /*
-     ***TREE***
-
-     promo           capture             non capture
-     4               1            piece exist   dst_rank(3/4)   dst_rank(else)     
-
-     5               3               2
-
-     1 === Run sub_array 2,3
-     1'=== No piece exist to capture
-
-     2 === Run sub_array 0
-     2'=== Pawn could not be found
-
-     3 === Run sub_array 0,1 in that order
-     3'=== Pawn could not be found
-
-     4 === dst rank must be final rank
-     4'=== Pawn can only promote on final rank
-
-     5 === dst_sqr should not have ANY piece
-     5'=== Pawn is blocked
-
-*/
-    /*
-       while(file_current->next != NULL){
-       for(int i=0;file_current->string1[i] != '\0';i++)
-       printf("%c",file_current->string1[i]);
-       printf("\t");
-       for(int i=0;file_current->string2[i] != '\0';i++)
-       printf("%c",file_current->string2[i]);
-       printf("\n");
-       file_current = file_current->next;
-       }
-       return 1;
-       */
-    /*
-     *
-     if(cmet.capture_sym && sub_array < 2){
-     continue;
-     }
-     else if(!cmet.capture_sym){
-     if(cb[dst_rank][dst_file].p == NULL){
-     if((((dst_rank == 4 && turn_flag == 1)||(dst_rank == 3 && turn_flag == -1)) && sub_array > 1)||
-     ((dst_rank != 4 && turn_flag == 1)||(dst_rank != 3 && turn_flag == -1)) && sub_array > 0){
-     printf("PAWN could not be found\n");
-     break;        
-     }
-     }
-     else{ 
-     if(cb[dst_rank][dst_file].p->type != K){
-     printf("Invalid move,PAWN is blocked\n");
-     return false;
-     }
-     else{
-     if(sub_array < 2)
-     continue;
-     }
-     }
-
-     if((((dst_rank == 4 && turn_flag == 1)||(dst_rank == 3 && turn_flag == -1)) && sub_array > 1 && cb[dst_rank][dst_file].p->type != K)||
-     ((dst_rank != 4 && turn_flag == 1)||(dst_rank != 3 && turn_flag == -1)) && sub_array > 0 && cb[dst_rank][dst_file].p->type != K){
-     printf("PAWN could not be found\n");
-     break;        
-     }
-     }
-     }
-     *
-     */
 

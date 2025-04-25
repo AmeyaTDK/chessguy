@@ -19,24 +19,3 @@ Rd8 15. Rxd8+ Kxd8 16. Rd1+ Ke8 17. Bxc6+ Nxc6 18. Qxb7 Nd8 19. Qxc7 g5 20. Bb6
 Kf8 21. Rxd8+ Kg7 22. Rxh8 Kxh8 23. Bd4 1-0
 
 
-
-1. d4 d5 2. c4 dxc4 3. e4 Nc6 4. Bxc4 Nxd4 5. Nf3 Bg4 6. Nc3 Bxf3 7. gxf3 e6 8.
-Be3 Nc6 9. Qb3 Rb8 10. Rd1 Qf6 11. Ke2 Bb4 12. Bb5 Bxc3 13. bxc3 Ne7 14. Bxa7
-Rd8 15. Rxd8+ Kxd8 16. Rd1+ Ke8 17. Bxc6+ Nxc6 18. Qxb7 Nd8 19. Qxc7 g5 20. Bb6
-Kf8 21. Rxd8+ Kg7 22. Rxh8 Kxh8 23. Bd4 1-0
-
-
-.d4 d5.c4 dxc4.
-
-//Calculatae size of main body and create array of that size
-//Store all main body  in the array
-//If \n is detected then shift remaining char to left by 1
-//
-
-//If '.' create new node and start record
-//If space = 1 -->store until next space comes up
-//If space = 2 -->store until next space comes up
-//If space = 3 -->stop record
-//Else do nothing
-
-
