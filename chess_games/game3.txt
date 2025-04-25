@@ -1,0 +1,11 @@
+[Event "?"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Link "https://www.chess.com/classroom/shaky-extra-pony"]
+
+1. e4 e5 2. d4 exd4 3. Qxd4 Nc6 4. Nc3 d6 5. e5 dxe5 6. Qe3 Be6 7. Nf3 a6 8.
+Nxe5 a5 9. Ng6 a4 10. Nf4 a3 11. Nxe6 axb2 12. Nxg7+ *

@@ -1,0 +1,12 @@
+[Event "?"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "?"]
+[Black "?"]
+[Result "1-0"]
+[Link "https://www.chess.com/classroom/solid-ordinary-walrus"]
+
+1. d4 e5 2. dxe5 d6 3. exd6 Qxd6 4. e4 Nc6 5. Be3 Qd5 6. Qe2 Nh6 7. exd5 a6 8.
+Bxh6+ Kd8 9. Qf3 b5 10. d6 Ke8 11. Bxg7 Bxg7 12. d7+ Kf8 13. d8=R+ Ke7 14. Rxh8
+Nb8 15. Qe4+ Kd7 16. Bxb5+ Kd6 17. Qc6+ Ke5 18. Re8+ Kd4 19. Qc4# 1-0
